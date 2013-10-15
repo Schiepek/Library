@@ -29,7 +29,7 @@ public class LibraryApp {
 		Library library = new Library();
 		initLibrary(library);
 		initBookMaster(library);
-		System.out.println("test");
+		System.out.println("hoi");
 	}
 	
 	public static void initBookMaster(final Library library) {
