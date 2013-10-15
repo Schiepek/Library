@@ -254,6 +254,7 @@ public class BookDetail extends JFrame {
 				selectedCopies.add(library.getCopiesOfBook(currentBook).get(s));
 			}
 			library.removeCopies(selectedCopies);
+			if(!library.bookExists(currentBook)) this.dispose();
 		}
 	}
 }
