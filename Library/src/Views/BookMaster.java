@@ -46,6 +46,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class BookMaster extends JFrame{
 
@@ -89,7 +91,7 @@ public class BookMaster extends JFrame{
 		inventoryPanel.setLayout(gbl_inventoryPanel);
 
 		
-		final JLabel Selectedlabel = new JLabel("Ausgew\u00E4hlt");
+		final JLabel Selectedlabel = new JLabel("AusgewÃ¤hlt: 0");
 		Selectedlabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		GridBagConstraints gbc_Selectedlabel = new GridBagConstraints();
 		gbc_Selectedlabel.anchor = GridBagConstraints.WEST;
@@ -99,9 +101,8 @@ public class BookMaster extends JFrame{
 		inventoryPanel.add(Selectedlabel, gbc_Selectedlabel);
 		
 		JButton showselectButton = new JButton("Selektierte Anzeigen");
-		showselectButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
+		showselectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				for(Book book : (List<Book>)bookList.getSelectedValuesList()) {
 					initBookDetail(book);
 				}
@@ -114,10 +115,9 @@ public class BookMaster extends JFrame{
 		inventoryPanel.add(showselectButton, gbc_showselectButton);
 		
 		JButton newbookButton = new JButton("Neues Buch hinzuf\u00FCgen");
-		newbookButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				initBookDetail(null);
+		newbookButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					initBookDetail(null);
 			}
 		});
 		GridBagConstraints gbc_newbookButton = new GridBagConstraints();
@@ -136,7 +136,7 @@ public class BookMaster extends JFrame{
 		inventoryPanel.add(scrollPane, gbc_scrollPane);
 		statisticPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
-		JLabel lblBookcountlabel = new JLabel("Anzahl Bücher: " + library.getBooks().size());
+		JLabel lblBookcountlabel = new JLabel("Anzahl BÃ¼cher: " + library.getBooks().size());
 		statisticPanel.add(lblBookcountlabel);
 		
 		JLabel lblBooktotallabel = new JLabel("Anzahl Exemplare: " + library.getCopies().size());
@@ -148,7 +148,7 @@ public class BookMaster extends JFrame{
 		bookList.addListSelectionListener(new ListSelectionListener() {
 			@SuppressWarnings("deprecation")
 			public void valueChanged(ListSelectionEvent e) {
-				Selectedlabel.setText("Ausgewählt " + bookList.getSelectedIndices().length);
+				Selectedlabel.setText("AusgewÃ¤hlt: " + bookList.getSelectedIndices().length);
 			}
 		});
 

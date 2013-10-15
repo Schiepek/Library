@@ -185,9 +185,8 @@ public class BookDetail extends JFrame {
 		ExamplePanel.add(quantityLabel, gbc_quantityLabel);
 		
 		JButton removeselectedButton = new JButton("Ausgew\u00E4hlte Entfernen");
-		removeselectedButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
+		removeselectedButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				deleteCopy();
 			}
 		});
@@ -198,9 +197,8 @@ public class BookDetail extends JFrame {
 		ExamplePanel.add(removeselectedButton, gbc_removeselectedButton);
 		
 		JButton addCopyButton = new JButton("Exemplar hinzuf\u00FCgen");
-		addCopyButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
+		addCopyButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				if (library.findByBookTitle(Titletextfield.getText()) == null) {createNewBook();}
 				else { createNewCopy(); }
 			}
@@ -240,6 +238,8 @@ public class BookDetail extends JFrame {
 		addedBook.setAuthor(Auhortextfield.getText());
 		addedBook.setPublisher(Pubishertextfield.getText());
 		addedBook.setShelf((Shelf)shelfcomboBox.getSelectedItem());
+		currentBook = addedBook;
+		createNewCopy();
 	}
 	
 	private void createNewCopy() {
