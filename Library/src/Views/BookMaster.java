@@ -22,6 +22,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.AbstractListModel;
@@ -55,6 +57,8 @@ public class BookMaster extends JFrame{
 	private JList bookList;
 	private Library library;
 	private BookListModel listModel;
+	private JLabel lblBookcountlabel;
+	private JLabel lblBooktotallabel;
 
 	public BookMaster(Library library) {
 		this.library = library;
@@ -91,7 +95,7 @@ public class BookMaster extends JFrame{
 		inventoryPanel.setLayout(gbl_inventoryPanel);
 
 		
-		final JLabel Selectedlabel = new JLabel("Ausgewählt: 0");
+		final JLabel Selectedlabel = new JLabel("Ausgewaehlt: 0");
 		Selectedlabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		GridBagConstraints gbc_Selectedlabel = new GridBagConstraints();
 		gbc_Selectedlabel.anchor = GridBagConstraints.WEST;
@@ -136,19 +140,34 @@ public class BookMaster extends JFrame{
 		inventoryPanel.add(scrollPane, gbc_scrollPane);
 		statisticPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
-		JLabel lblBookcountlabel = new JLabel("Anzahl Bücher: " + library.getBooks().size());
+		lblBookcountlabel = new JLabel("Anzahl Buecher: " + library.getBooks().size());
 		statisticPanel.add(lblBookcountlabel);
 		
-		JLabel lblBooktotallabel = new JLabel("Anzahl Exemplare: " + library.getCopies().size());
+		lblBooktotallabel = new JLabel("Anzahl Exemplare: " + library.getCopies().size());
 		statisticPanel.add(lblBooktotallabel);	
 
 		bookList = new JList();
 		listModel = new BookListModel(library);
+		listModel.addListDataListener(new ListDataListener() {
+			@Override
+			public void contentsChanged(ListDataEvent arg0) {
+				refreshLabelCount();
+			}
+			@Override
+			public void intervalAdded(ListDataEvent arg0) {
+				refreshLabelCount();
+			}
+			@Override
+			public void intervalRemoved(ListDataEvent arg0) {
+				refreshLabelCount();
+			}
+			
+		});
 		bookList.setModel(listModel);
 		bookList.addListSelectionListener(new ListSelectionListener() {
 			@SuppressWarnings("deprecation")
 			public void valueChanged(ListSelectionEvent e) {
-				Selectedlabel.setText("Ausgewählt: " + bookList.getSelectedIndices().length);
+				Selectedlabel.setText("Ausgewaehlt: " + bookList.getSelectedIndices().length);
 			}
 		});
 
@@ -163,6 +182,11 @@ public class BookMaster extends JFrame{
 		contentPane.add(lblSwinginglibrarytextpanel, BorderLayout.NORTH);
 		
 
+	}
+	
+	private void refreshLabelCount() {
+		lblBookcountlabel.setText("Anzahl Buecher: " + library.getBooks().size());
+		lblBooktotallabel.setText("Anzahl Exemplare: " + library.getCopies().size());
 	}
 	
 	

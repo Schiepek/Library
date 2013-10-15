@@ -43,6 +43,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class BookDetail extends JFrame {
 
@@ -239,6 +241,8 @@ public class BookDetail extends JFrame {
 		addedBook.setPublisher(Pubishertextfield.getText());
 		addedBook.setShelf((Shelf)shelfcomboBox.getSelectedItem());
 		currentBook = addedBook;
+		copyModel = new CopyListModel(library, currentBook);
+		copyList.setModel(copyModel);
 		createNewCopy();
 	}
 	

@@ -148,6 +148,7 @@ public class Library extends Observable{
 		for(Copy copy : copies) {
 			removeCopy(copy);
 		}
+		doNotify();
 	}
 	
 	public void removeBook(Book book) {

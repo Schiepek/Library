@@ -22,7 +22,6 @@ public class CopyListModel extends AbstractListModel implements Observer {
 		library.addObserver(this);
 		this.library = library;
 		this.currentBook = book;
-
 	}	
 	
 	private String getLoanInformation(Copy currentCopy) {
