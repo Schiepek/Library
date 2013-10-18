@@ -15,6 +15,7 @@ import java.awt.FlowLayout;
 
 import javax.swing.BoxLayout;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
@@ -29,6 +30,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
@@ -159,6 +161,17 @@ public class BookMaster extends JFrame{
 		statisticJPanel.add(copiesCountJLabel);	
 
 		bookJList = new JList();
+		bookJList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				 if(bookJList.getSelectedIndex() != -1)  {
+					 if (e.getClickCount() == 2) {
+						 new BookDetail(library, (Book)bookJList.getSelectedValue());
+					 }
+			     }
+			}
+		});
 		listModel = new BookListModel(library);
 		listModel.addListDataListener(new ListDataListener() {
 			@Override
