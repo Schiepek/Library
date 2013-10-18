@@ -76,7 +76,6 @@ public class BookDetail extends JFrame {
 		if (currentBook == null) { currentBook = initEmptyBook(); }
 		this.currentBook = currentBook;
 		
-		
 		initGUI();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -110,7 +109,7 @@ public class BookDetail extends JFrame {
 		gbl_bookInformationJPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		bookInformationJPanel.setLayout(gbl_bookInformationJPanel);
 		
-		errorJLabel = new JLabel("Bitte llen Sie alle Felder aus.");
+		errorJLabel = new JLabel("Bitte füllen Sie alle Felder aus.");
 		errorJLabel.setIcon(erImage);
 		errorJLabel.setVisible(false);
 		GridBagConstraints gbc_erorrJLabel = new GridBagConstraints();
@@ -193,9 +192,10 @@ public class BookDetail extends JFrame {
 		gbc_shelfcomboBox.gridy = 3;
 		bookInformationJPanel.add(shelfJComboBox, gbc_shelfcomboBox);
 		
-		
-		
-		saveJButton = new JButton("speichern");
+		saveJButton = new JButton("Änderungen speichern");
+		if (currentBook.getName().isEmpty()) {
+			saveJButton.setVisible(false);
+		}
 		saveJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -203,11 +203,11 @@ public class BookDetail extends JFrame {
 					BookDetail.this.currentBook.setAuthor(authorJTextField.getText());
 					BookDetail.this.currentBook.setPublisher(publisherJTextField.getText());
 					BookDetail.this.currentBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
+					errorJLabel.setVisible(false);
 				} catch (IllegalArgumentException ex) {
 					errorJLabel.setText(ex.getMessage());
 					errorJLabel.setVisible(true);
 				}
-				
 			}
 		});
 		
@@ -241,6 +241,9 @@ public class BookDetail extends JFrame {
 		removeSelectedJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				deleteCopy();
+				if (copyList.getSelectedIndex() == -1) {
+					removeSelectedJButton.setEnabled(false);
+				}
 			}
 		});
 		GridBagConstraints gbc_removeselectedButton = new GridBagConstraints();
@@ -252,8 +255,22 @@ public class BookDetail extends JFrame {
 		addCopyJButton = new JButton("Exemplar hinzufügen");
 		addCopyJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (library.findByBookTitle(titleJTextField.getText()) == null) {createNewBook();}
-				else { createNewCopy(); }
+				if (currentBook.getName().isEmpty()) {
+					try {
+						BookDetail.this.currentBook.setName(titleJTextField.getText());
+						BookDetail.this.currentBook.setAuthor(authorJTextField.getText());
+						BookDetail.this.currentBook.setPublisher(publisherJTextField.getText());
+						BookDetail.this.currentBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
+						createNewCopy();
+						saveJButton.setVisible(true);
+						errorJLabel.setVisible(false);
+					} catch (IllegalArgumentException ex) {
+						errorJLabel.setText(ex.getMessage());
+						errorJLabel.setVisible(true);
+					}
+				} else {
+					createNewCopy();
+				}
 			}
 		});
 
@@ -287,17 +304,16 @@ public class BookDetail extends JFrame {
 		copyList.setModel(copyModel);
 	}
 	
-	
-	private void createNewBook() {
-		Book addedBook = library.createAndAddBook(titleJTextField.getText());
-		addedBook.setAuthor(authorJTextField.getText());
-		addedBook.setPublisher(publisherJTextField.getText());
-		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
-		currentBook = addedBook;
-		copyModel = new CopyListModel(library, currentBook);
-		copyList.setModel(copyModel);
-		createNewCopy();
-	}
+//	private void createNewBook() {
+//		Book addedBook = library.createAndAddBook(titleJTextField.getText());
+//		addedBook.setAuthor(authorJTextField.getText());
+//		addedBook.setPublisher(publisherJTextField.getText());
+//		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
+//		currentBook = addedBook;
+//		copyModel = new CopyListModel(library, currentBook);
+//		copyList.setModel(copyModel);
+//		createNewCopy();
+//	}
 	
 	private void createNewCopy() {
 		library.createAndAddCopy(currentBook);
@@ -311,7 +327,10 @@ public class BookDetail extends JFrame {
 				selectedCopies.add(library.getCopiesOfBook(currentBook).get(s));
 			}
 			library.removeCopies(selectedCopies);
-			if(!library.bookExists(currentBook)) this.dispose();
+			if(!library.bookExists(currentBook)) {
+				this.dispose();
+			}
+			copyList.clearSelection();
 		}
 	}
 

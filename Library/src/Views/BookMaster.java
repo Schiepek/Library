@@ -164,7 +164,6 @@ public class BookMaster extends JFrame{
 		bookJList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
 				 if(bookJList.getSelectedIndex() != -1)  {
 					 if (e.getClickCount() == 2) {
 						 new BookDetail(library, (Book)bookJList.getSelectedValue());

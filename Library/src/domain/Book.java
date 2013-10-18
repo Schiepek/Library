@@ -21,6 +21,7 @@ public class Book extends Observable {
 			throw new IllegalArgumentException("Bitte Titel des Buches eingeben");
 		}
 		this.title = name;
+		doNotify();
 	}
 
 	public String getAuthor() {
@@ -32,6 +33,7 @@ public class Book extends Observable {
 			throw new IllegalArgumentException("Bitte Autor des Buches eingeben");
 		}
 		this.author = autor;
+		doNotify();
 	}
 
 	public String getPublisher() {
@@ -43,6 +45,7 @@ public class Book extends Observable {
 			throw new IllegalArgumentException("Bitte Verlag des Buches eingeben");
 		}
 		this.publisher = publisher;
+		doNotify();
 	}
 	
 	public Shelf getShelf() {
@@ -54,6 +57,7 @@ public class Book extends Observable {
 			throw new IllegalArgumentException("Bitte Regal des Buches eingeben");
 		}
 		this.shelf = shelf;
+		doNotify();
 	}
 	
 	@Override
