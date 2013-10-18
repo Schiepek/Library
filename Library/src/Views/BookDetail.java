@@ -2,7 +2,6 @@ package Views;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -41,47 +41,56 @@ import javax.swing.JScrollPane;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+
 public class BookDetail extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField Titletextfield;
-	private JTextField Auhortextfield;
-	private JTextField Pubishertextfield;
-	private JComboBox shelfcomboBox;
+	private JTextField titleJTextField;
+	private JTextField authorJTextField;
+	private JTextField publisherJTextField;
+	private JComboBox shelfJComboBox;
 	private Library library;
 	private Book currentBook;
-	JList copyList;
-	CopyListModel copyModel;
+	private JButton removeSelectedJButton;
+	private JList copyList;
+	private JLabel titleJLabel;
+	private CopyListModel copyModel;
+	private JButton saveJButton;
+	private JButton addCopyJButton;
+	private ImageIcon erImage = new ImageIcon("src/erroricon.png");
+	private JLabel errorJLabel;
 
-	/**
-	 * Launch the application.
-	 */
-	private void initBookDetail() {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					BookDetail frame = new BookDetail(library,currentBook);
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public BookDetail(Library library , Book currentBook) {
+		super();
+		this.library = library;
+		if (currentBook == null) { currentBook = initEmptyBook(); }
+		this.currentBook = currentBook;
+		
+		
+		initGUI();
+		setLocationRelativeTo(null);
+		setVisible(true);
+	}
+	
+	private Book initEmptyBook() {
+		Book tempBook = new Book("");
+		return tempBook;
 	}
 
-	/**
-	 * Create the frame.
-	 */
-	public BookDetail(final Library library , Book currentBook) {
-		this.library = library;
-		this.currentBook = currentBook;
-		if (currentBook == null) { currentBook = initEmptyBook(); }
-		
+	
+	private void initGUI() {
+		this.setMinimumSize(new Dimension(600, 400));
+				
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -89,94 +98,135 @@ public class BookDetail extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		
-		JPanel BookInformationPanel = new JPanel();
-		BookInformationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
-		BookInformationPanel.setBorder(new TitledBorder(null, "Buch Informationen", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		contentPane.add(BookInformationPanel);
-		GridBagLayout gbl_BookInformationPanel = new GridBagLayout();
-		gbl_BookInformationPanel.columnWidths = new int[]{0, 0, 0};
-		gbl_BookInformationPanel.rowHeights = new int[]{0, 0, 0, 0, 0};
-		gbl_BookInformationPanel.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		gbl_BookInformationPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		BookInformationPanel.setLayout(gbl_BookInformationPanel);
 		
-		JLabel TitleLabel = new JLabel("Titel");
-		GridBagConstraints gbc_TitleLabel = new GridBagConstraints();
-		gbc_TitleLabel.anchor = GridBagConstraints.WEST;
-		gbc_TitleLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_TitleLabel.gridx = 0;
-		gbc_TitleLabel.gridy = 0;
-		BookInformationPanel.add(TitleLabel, gbc_TitleLabel);
+		JPanel bookInformationJPanel = new JPanel();
+		bookInformationJPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
+		bookInformationJPanel.setBorder(new TitledBorder(null, "Buch Informationen", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPane.add(bookInformationJPanel);
+		GridBagLayout gbl_bookInformationJPanel = new GridBagLayout();
+		gbl_bookInformationJPanel.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_bookInformationJPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
+		gbl_bookInformationJPanel.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_bookInformationJPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		bookInformationJPanel.setLayout(gbl_bookInformationJPanel);
 		
-		Titletextfield = new JTextField(currentBook.getName());
-		GridBagConstraints gbc_Titletextfield = new GridBagConstraints();
-		gbc_Titletextfield.insets = new Insets(0, 0, 5, 0);
-		gbc_Titletextfield.fill = GridBagConstraints.HORIZONTAL;
-		gbc_Titletextfield.gridx = 1;
-		gbc_Titletextfield.gridy = 0;
-		BookInformationPanel.add(Titletextfield, gbc_Titletextfield);
-		Titletextfield.setColumns(10);
+		errorJLabel = new JLabel("Bitte llen Sie alle Felder aus.");
+		errorJLabel.setIcon(erImage);
+		errorJLabel.setVisible(false);
+		GridBagConstraints gbc_erorrJLabel = new GridBagConstraints();
+		gbc_erorrJLabel.anchor = GridBagConstraints.EAST;
+		gbc_erorrJLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_erorrJLabel.gridx = 1;
+		gbc_erorrJLabel.gridy = 4;
+		bookInformationJPanel.add(errorJLabel, gbc_erorrJLabel);
 		
-		JLabel AuthorLabel = new JLabel("Autor");
-		GridBagConstraints gbc_AuthorLabel = new GridBagConstraints();
-		gbc_AuthorLabel.anchor = GridBagConstraints.WEST;
-		gbc_AuthorLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_AuthorLabel.gridx = 0;
-		gbc_AuthorLabel.gridy = 1;
-		BookInformationPanel.add(AuthorLabel, gbc_AuthorLabel);
+		titleJLabel = new JLabel("Titel");
+		GridBagConstraints gbc_titleJLabel = new GridBagConstraints();
+		gbc_titleJLabel.anchor = GridBagConstraints.WEST;
+		gbc_titleJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_titleJLabel.gridx = 0;
+		gbc_titleJLabel.gridy = 0;
+		bookInformationJPanel.add(titleJLabel, gbc_titleJLabel);
 		
-		Auhortextfield = new JTextField(currentBook.getAuthor());
-		GridBagConstraints gbc_Auhortextfield = new GridBagConstraints();
-		gbc_Auhortextfield.insets = new Insets(0, 0, 5, 0);
-		gbc_Auhortextfield.fill = GridBagConstraints.HORIZONTAL;
-		gbc_Auhortextfield.gridx = 1;
-		gbc_Auhortextfield.gridy = 1;
-		BookInformationPanel.add(Auhortextfield, gbc_Auhortextfield);
-		Auhortextfield.setColumns(10);
+		titleJTextField = new JTextField(currentBook.getName());
+		GridBagConstraints gbc_titleJTextField = new GridBagConstraints();
+		gbc_titleJTextField.gridwidth = 2;
+		gbc_titleJTextField.insets = new Insets(0, 0, 5, 0);
+		gbc_titleJTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_titleJTextField.gridx = 1;
+		gbc_titleJTextField.gridy = 0;
+		bookInformationJPanel.add(titleJTextField, gbc_titleJTextField);
+		titleJTextField.setColumns(10);
 		
-		JLabel Publisherlabel = new JLabel("Verlag");
-		GridBagConstraints gbc_Publisherlabel = new GridBagConstraints();
-		gbc_Publisherlabel.anchor = GridBagConstraints.WEST;
-		gbc_Publisherlabel.insets = new Insets(0, 0, 5, 5);
-		gbc_Publisherlabel.gridx = 0;
-		gbc_Publisherlabel.gridy = 2;
-		BookInformationPanel.add(Publisherlabel, gbc_Publisherlabel);
+		JLabel authorJLabel = new JLabel("Autor");
+		GridBagConstraints gbc_authorJLabel = new GridBagConstraints();
+		gbc_authorJLabel.anchor = GridBagConstraints.WEST;
+		gbc_authorJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_authorJLabel.gridx = 0;
+		gbc_authorJLabel.gridy = 1;
+		bookInformationJPanel.add(authorJLabel, gbc_authorJLabel);
 		
-		Pubishertextfield = new JTextField(currentBook.getPublisher());
-		GridBagConstraints gbc_Pubishertextfield = new GridBagConstraints();
-		gbc_Pubishertextfield.insets = new Insets(0, 0, 5, 0);
-		gbc_Pubishertextfield.fill = GridBagConstraints.HORIZONTAL;
-		gbc_Pubishertextfield.gridx = 1;
-		gbc_Pubishertextfield.gridy = 2;
-		BookInformationPanel.add(Pubishertextfield, gbc_Pubishertextfield);
-		Pubishertextfield.setColumns(10);
+		authorJTextField = new JTextField(currentBook.getAuthor());
+		GridBagConstraints gbc_authorJTextField = new GridBagConstraints();
+		gbc_authorJTextField.gridwidth = 2;
+		gbc_authorJTextField.insets = new Insets(0, 0, 5, 0);
+		gbc_authorJTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_authorJTextField.gridx = 1;
+		gbc_authorJTextField.gridy = 1;
+		bookInformationJPanel.add(authorJTextField, gbc_authorJTextField);
+		authorJTextField.setColumns(10);
 		
-		JLabel Shelflabel = new JLabel("Regal");
-		GridBagConstraints gbc_Shelflabel = new GridBagConstraints();
-		gbc_Shelflabel.anchor = GridBagConstraints.EAST;
-		gbc_Shelflabel.insets = new Insets(0, 0, 0, 5);
-		gbc_Shelflabel.gridx = 0;
-		gbc_Shelflabel.gridy = 3;
-		BookInformationPanel.add(Shelflabel, gbc_Shelflabel);
+		JLabel publisherJLabel = new JLabel("Verlag");
+		GridBagConstraints gbc_publisherJLabel = new GridBagConstraints();
+		gbc_publisherJLabel.anchor = GridBagConstraints.WEST;
+		gbc_publisherJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_publisherJLabel.gridx = 0;
+		gbc_publisherJLabel.gridy = 2;
+		bookInformationJPanel.add(publisherJLabel, gbc_publisherJLabel);
 		
-		shelfcomboBox = new JComboBox();
-		shelfcomboBox.setModel(new DefaultComboBoxModel(Shelf.values()));
-		shelfcomboBox.setSelectedItem(currentBook.getShelf());
+		publisherJTextField = new JTextField(currentBook.getPublisher());
+		GridBagConstraints gbc_publisherJTextField = new GridBagConstraints();
+		gbc_publisherJTextField.gridwidth = 2;
+		gbc_publisherJTextField.insets = new Insets(0, 0, 5, 0);
+		gbc_publisherJTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_publisherJTextField.gridx = 1;
+		gbc_publisherJTextField.gridy = 2;
+		bookInformationJPanel.add(publisherJTextField, gbc_publisherJTextField);
+		publisherJTextField.setColumns(10);
+		
+		JLabel shelfJLabel = new JLabel("Regal");
+		GridBagConstraints gbc_shelfJLabel = new GridBagConstraints();
+		gbc_shelfJLabel.anchor = GridBagConstraints.EAST;
+		gbc_shelfJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_shelfJLabel.gridx = 0;
+		gbc_shelfJLabel.gridy = 3;
+		bookInformationJPanel.add(shelfJLabel, gbc_shelfJLabel);
+		
+		shelfJComboBox = new JComboBox();
+		shelfJComboBox.setModel(new DefaultComboBoxModel(Shelf.values()));
+		shelfJComboBox.setSelectedItem(currentBook.getShelf());
 		GridBagConstraints gbc_shelfcomboBox = new GridBagConstraints();
+		gbc_shelfcomboBox.gridwidth = 2;
+		gbc_shelfcomboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_shelfcomboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_shelfcomboBox.gridx = 1;
 		gbc_shelfcomboBox.gridy = 3;
-		BookInformationPanel.add(shelfcomboBox, gbc_shelfcomboBox);
+		bookInformationJPanel.add(shelfJComboBox, gbc_shelfcomboBox);
 		
-		JPanel ExamplePanel = new JPanel();
-		ExamplePanel.setBorder(new TitledBorder(null, "Exemplare", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		contentPane.add(ExamplePanel);
+		
+		
+		saveJButton = new JButton("speichern");
+		saveJButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					BookDetail.this.currentBook.setName(titleJTextField.getText());
+					BookDetail.this.currentBook.setAuthor(authorJTextField.getText());
+					BookDetail.this.currentBook.setPublisher(publisherJTextField.getText());
+					BookDetail.this.currentBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
+				} catch (IllegalArgumentException ex) {
+					errorJLabel.setText(ex.getMessage());
+					errorJLabel.setVisible(true);
+				}
+				
+			}
+		});
+		
+		
+		GridBagConstraints gbc_btnSpeichern = new GridBagConstraints();
+		gbc_btnSpeichern.anchor = GridBagConstraints.EAST;
+		gbc_btnSpeichern.gridx = 2;
+		gbc_btnSpeichern.gridy = 4;
+		bookInformationJPanel.add(saveJButton, gbc_btnSpeichern);
+		
+		JPanel exampleJPanel = new JPanel();
+		exampleJPanel.setBorder(new TitledBorder(null, "Exemplare", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPane.add(exampleJPanel);
 		GridBagLayout gbl_ExamplePanel = new GridBagLayout();
 		gbl_ExamplePanel.columnWidths = new int[]{0, 0, 0, 0};
 		gbl_ExamplePanel.rowHeights = new int[]{0, 0, 0};
 		gbl_ExamplePanel.columnWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_ExamplePanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		ExamplePanel.setLayout(gbl_ExamplePanel);
+		exampleJPanel.setLayout(gbl_ExamplePanel);
 		
 		JLabel quantityLabel = new JLabel("Anzahl: " + library.getCopiesOfBook(currentBook).size());
 		GridBagConstraints gbc_quantityLabel = new GridBagConstraints();
@@ -184,10 +234,11 @@ public class BookDetail extends JFrame {
 		gbc_quantityLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_quantityLabel.gridx = 0;
 		gbc_quantityLabel.gridy = 0;
-		ExamplePanel.add(quantityLabel, gbc_quantityLabel);
+		exampleJPanel.add(quantityLabel, gbc_quantityLabel);
 		
-		JButton removeselectedButton = new JButton("Ausgew\u00E4hlte Entfernen");
-		removeselectedButton.addActionListener(new ActionListener() {
+		removeSelectedJButton = new JButton("Ausgewählte Entfernen");
+		removeSelectedJButton.setEnabled(false);
+		removeSelectedJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				deleteCopy();
 			}
@@ -196,12 +247,12 @@ public class BookDetail extends JFrame {
 		gbc_removeselectedButton.insets = new Insets(0, 0, 5, 5);
 		gbc_removeselectedButton.gridx = 1;
 		gbc_removeselectedButton.gridy = 0;
-		ExamplePanel.add(removeselectedButton, gbc_removeselectedButton);
+		exampleJPanel.add(removeSelectedJButton, gbc_removeselectedButton);
 		
-		JButton addCopyButton = new JButton("Exemplar hinzuf\u00FCgen");
-		addCopyButton.addActionListener(new ActionListener() {
+		addCopyJButton = new JButton("Exemplar hinzufügen");
+		addCopyJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (library.findByBookTitle(Titletextfield.getText()) == null) {createNewBook();}
+				if (library.findByBookTitle(titleJTextField.getText()) == null) {createNewBook();}
 				else { createNewCopy(); }
 			}
 		});
@@ -210,7 +261,7 @@ public class BookDetail extends JFrame {
 		gbc_addCopyButton.insets = new Insets(0, 0, 5, 0);
 		gbc_addCopyButton.gridx = 2;
 		gbc_addCopyButton.gridy = 0;
-		ExamplePanel.add(addCopyButton, gbc_addCopyButton);
+		exampleJPanel.add(addCopyJButton, gbc_addCopyButton);
 		copyModel = new CopyListModel(library, currentBook);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -220,26 +271,28 @@ public class BookDetail extends JFrame {
 		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 1;
-		ExamplePanel.add(scrollPane, gbc_scrollPane);
+		exampleJPanel.add(scrollPane, gbc_scrollPane);
 		
 		copyList = new JList();
+		copyList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (copyList.getSelectedIndices().length > 0) {
+					removeSelectedJButton.setEnabled(true);
+				} else {
+					removeSelectedJButton.setEnabled(false);
+				}
+			}
+		});
 		scrollPane.setViewportView(copyList);
 		copyList.setModel(copyModel);
 	}
 	
-	private Book initEmptyBook() {
-		Book tempBook = new Book("leer");
-		tempBook.setAuthor("leer");
-		tempBook.setPublisher("leer");
-		tempBook.setShelf(Shelf.A1);
-		return tempBook;
-	}
 	
 	private void createNewBook() {
-		Book addedBook = library.createAndAddBook(Titletextfield.getText());
-		addedBook.setAuthor(Auhortextfield.getText());
-		addedBook.setPublisher(Pubishertextfield.getText());
-		addedBook.setShelf((Shelf)shelfcomboBox.getSelectedItem());
+		Book addedBook = library.createAndAddBook(titleJTextField.getText());
+		addedBook.setAuthor(authorJTextField.getText());
+		addedBook.setPublisher(publisherJTextField.getText());
+		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
 		currentBook = addedBook;
 		copyModel = new CopyListModel(library, currentBook);
 		copyList.setModel(copyModel);
@@ -261,4 +314,5 @@ public class BookDetail extends JFrame {
 			if(!library.bookExists(currentBook)) this.dispose();
 		}
 	}
+
 }

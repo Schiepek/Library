@@ -1,6 +1,6 @@
 package application;
 
-import java.awt.EventQueue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.GregorianCalendar;
@@ -28,20 +28,8 @@ public class LibraryApp {
 	public static void main(String[] args) throws Exception {
 		Library library = new Library();
 		initLibrary(library);
-		initBookMaster(library);
-	}
-	
-	public static void initBookMaster(final Library library) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					BookMaster master = new BookMaster(library);
-					master.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		//initBookMaster(library);
+		new BookMaster(library);
 	}
 
 	private static void initLibrary(Library library)

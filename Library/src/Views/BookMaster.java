@@ -1,7 +1,6 @@
 package Views;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -54,15 +53,25 @@ import java.awt.event.ActionEvent;
 public class BookMaster extends JFrame{
 
 	private JPanel contentPane;
-	private JList bookList;
+	private JList bookJList;
 	private Library library;
 	private BookListModel listModel;
-	private JLabel lblBookcountlabel;
-	private JLabel lblBooktotallabel;
+	private JLabel bookCountJLabel;
+	private JLabel copiesCountJLabel;
+	private JButton showSelectedJButton;
 
 	public BookMaster(Library library) {
+		super();
 		this.library = library;
 		
+		initGUI();
+		setLocationRelativeTo(null);
+		setVisible(true);
+	}
+	
+	private void initGUI() {
+		
+		this.setMinimumSize(new Dimension(800, 500));
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 633, 474);
@@ -78,57 +87,60 @@ public class BookMaster extends JFrame{
 		tabbedPane.addTab("B\u00FCcher", null, bookLayeredPane, null);
 		bookLayeredPane.setLayout(new BoxLayout(bookLayeredPane, BoxLayout.Y_AXIS));
 		
-		JPanel statisticPanel = new JPanel();
-		statisticPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
-		bookLayeredPane.add(statisticPanel);
-		statisticPanel.setBorder(new TitledBorder(null, "Inventar Statistiken", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		JPanel statisticJPanel = new JPanel();
+		statisticJPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
+		bookLayeredPane.add(statisticJPanel);
+		statisticJPanel.setBorder(new TitledBorder(null, "Inventar Statistiken", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 
-		JPanel inventoryPanel = new JPanel();
-		bookLayeredPane.add(inventoryPanel);
-		inventoryPanel.setBorder(new TitledBorder(null, "Buch-Inventar", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		GridBagLayout gbl_inventoryPanel = new GridBagLayout();
-		gbl_inventoryPanel.columnWidths = new int[]{0, 0, 0, 0};
-		gbl_inventoryPanel.rowHeights = new int[]{0, 0, 0};
-		gbl_inventoryPanel.columnWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_inventoryPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		inventoryPanel.setLayout(gbl_inventoryPanel);
+		JPanel inventoryJPanel = new JPanel();
+		bookLayeredPane.add(inventoryJPanel);
+		inventoryJPanel.setBorder(new TitledBorder(null, "Buch-Inventar", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GridBagLayout gbl_inventoryJPanel = new GridBagLayout();
+		gbl_inventoryJPanel.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_inventoryJPanel.rowHeights = new int[]{0, 0, 0};
+		gbl_inventoryJPanel.columnWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_inventoryJPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		inventoryJPanel.setLayout(gbl_inventoryJPanel);
 
 		
-		final JLabel Selectedlabel = new JLabel("Ausgewaehlt: 0");
-		Selectedlabel.setVerticalAlignment(SwingConstants.BOTTOM);
-		GridBagConstraints gbc_Selectedlabel = new GridBagConstraints();
-		gbc_Selectedlabel.anchor = GridBagConstraints.WEST;
-		gbc_Selectedlabel.insets = new Insets(0, 0, 5, 5);
-		gbc_Selectedlabel.gridx = 0;
-		gbc_Selectedlabel.gridy = 0;
-		inventoryPanel.add(Selectedlabel, gbc_Selectedlabel);
+		final JLabel selectedJLabel = new JLabel("Ausgewaehlt: 0");
+		selectedJLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		GridBagConstraints gbc_selectedJLabel = new GridBagConstraints();
+		gbc_selectedJLabel.anchor = GridBagConstraints.WEST;
+		gbc_selectedJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_selectedJLabel.gridx = 0;
+		gbc_selectedJLabel.gridy = 0;
+		inventoryJPanel.add(selectedJLabel, gbc_selectedJLabel);
 		
-		JButton showselectButton = new JButton("Selektierte Anzeigen");
-		showselectButton.addActionListener(new ActionListener() {
+		showSelectedJButton = new JButton("Selektierte Anzeigen");
+		showSelectedJButton.setEnabled(false);
+		showSelectedJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				for(Book book : (List<Book>)bookList.getSelectedValuesList()) {
-					initBookDetail(book);
+				for(Book book : (List<Book>)bookJList.getSelectedValuesList()) {
+					//initBookDetail(book);
+					new BookDetail(library, book);
 				}
 			}
 		});
-		GridBagConstraints gbc_showselectButton = new GridBagConstraints();
-		gbc_showselectButton.insets = new Insets(0, 0, 5, 5);
-		gbc_showselectButton.gridx = 1;
-		gbc_showselectButton.gridy = 0;
-		inventoryPanel.add(showselectButton, gbc_showselectButton);
+		GridBagConstraints gbc_showSelectedJButton = new GridBagConstraints();
+		gbc_showSelectedJButton.insets = new Insets(0, 0, 5, 5);
+		gbc_showSelectedJButton.gridx = 1;
+		gbc_showSelectedJButton.gridy = 0;
+		inventoryJPanel.add(showSelectedJButton, gbc_showSelectedJButton);
 		
-		JButton newbookButton = new JButton("Neues Buch hinzuf\u00FCgen");
-		newbookButton.addActionListener(new ActionListener() {
+		JButton newBookJButton = new JButton("Neues Buch hinzufügen");
+		newBookJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					initBookDetail(null);
+				new BookDetail(library, null);
+					//initBookDetail(null);
 			}
 		});
-		GridBagConstraints gbc_newbookButton = new GridBagConstraints();
-		gbc_newbookButton.insets = new Insets(0, 0, 5, 0);
-		gbc_newbookButton.gridx = 2;
-		gbc_newbookButton.gridy = 0;
-		inventoryPanel.add(newbookButton, gbc_newbookButton);
+		GridBagConstraints gbc_newBookJButton = new GridBagConstraints();
+		gbc_newBookJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_newBookJButton.gridx = 2;
+		gbc_newBookJButton.gridy = 0;
+		inventoryJPanel.add(newBookJButton, gbc_newBookJButton);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -137,16 +149,16 @@ public class BookMaster extends JFrame{
 		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 1;
-		inventoryPanel.add(scrollPane, gbc_scrollPane);
-		statisticPanel.setLayout(new GridLayout(0, 2, 0, 0));
+		inventoryJPanel.add(scrollPane, gbc_scrollPane);
+		statisticJPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
-		lblBookcountlabel = new JLabel("Anzahl Buecher: " + library.getBooks().size());
-		statisticPanel.add(lblBookcountlabel);
+		bookCountJLabel = new JLabel("Anzahl Buecher: " + library.getBooks().size());
+		statisticJPanel.add(bookCountJLabel);
 		
-		lblBooktotallabel = new JLabel("Anzahl Exemplare: " + library.getCopies().size());
-		statisticPanel.add(lblBooktotallabel);	
+		copiesCountJLabel = new JLabel("Anzahl Exemplare: " + library.getCopies().size());
+		statisticJPanel.add(copiesCountJLabel);	
 
-		bookList = new JList();
+		bookJList = new JList();
 		listModel = new BookListModel(library);
 		listModel.addListDataListener(new ListDataListener() {
 			@Override
@@ -163,44 +175,36 @@ public class BookMaster extends JFrame{
 			}
 			
 		});
-		bookList.setModel(listModel);
-		bookList.addListSelectionListener(new ListSelectionListener() {
+		bookJList.setModel(listModel);
+		bookJList.addListSelectionListener(new ListSelectionListener() {
 			@SuppressWarnings("deprecation")
 			public void valueChanged(ListSelectionEvent e) {
-				Selectedlabel.setText("Ausgewaehlt: " + bookList.getSelectedIndices().length);
+				selectedJLabel.setText("Ausgewaehlt: " + bookJList.getSelectedIndices().length);
+				if (bookJList.getSelectedIndices().length > 0) {
+					showSelectedJButton.setEnabled(true);
+				} else {
+					showSelectedJButton.setEnabled(false);
+				}
 			}
 		});
 
 		
-		scrollPane.setViewportView(bookList);		
+		scrollPane.setViewportView(bookJList);		
 		JLayeredPane loanLayeredPane = new JLayeredPane();
 		tabbedPane.addTab("Ausleihen", null, loanLayeredPane, null);
 		
-		JLabel lblSwinginglibrarytextpanel = new JLabel("Swinging Library");
-		lblSwinginglibrarytextpanel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		lblSwinginglibrarytextpanel.setHorizontalAlignment(SwingConstants.RIGHT);
-		contentPane.add(lblSwinginglibrarytextpanel, BorderLayout.NORTH);
+		JLabel titleJLabel = new JLabel("Swinging Library");
+		titleJLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		titleJLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		contentPane.add(titleJLabel, BorderLayout.NORTH);
 		
 
 	}
 	
 	private void refreshLabelCount() {
-		lblBookcountlabel.setText("Anzahl Buecher: " + library.getBooks().size());
-		lblBooktotallabel.setText("Anzahl Exemplare: " + library.getCopies().size());
+		bookCountJLabel.setText("Anzahl Buecher: " + library.getBooks().size());
+		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
 	}
 	
 	
-	private void initBookDetail(final Book book) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-						BookDetail frame = new BookDetail(library,book);
-						frame.setVisible(true);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 }

@@ -1,12 +1,15 @@
 package domain;
 
-public class Book {
+import java.util.Observable;
+
+public class Book extends Observable {
 	
 	private String title, author, publisher;
 	private Shelf shelf;
 	
 	public Book(String name) {
 		this.title = name;
+		doNotify();
 	}
 
 	public String getName() {
@@ -14,6 +17,9 @@ public class Book {
 	}
 
 	public void setName(String name) {
+		if (name.isEmpty() || name == "") {
+			throw new IllegalArgumentException("Bitte Titel des Buches eingeben");
+		}
 		this.title = name;
 	}
 
@@ -22,6 +28,9 @@ public class Book {
 	}
 
 	public void setAuthor(String autor) {
+		if (autor.isEmpty() || autor == "") {
+			throw new IllegalArgumentException("Bitte Autor des Buches eingeben");
+		}
 		this.author = autor;
 	}
 
@@ -30,6 +39,9 @@ public class Book {
 	}
 
 	public void setPublisher(String publisher) {
+		if (publisher.isEmpty() || publisher == "") {
+			throw new IllegalArgumentException("Bitte Verlag des Buches eingeben");
+		}
 		this.publisher = publisher;
 	}
 	
@@ -38,11 +50,19 @@ public class Book {
 	}
 	
 	public void setShelf(Shelf shelf) {
+		if (shelf == null) {
+			throw new IllegalArgumentException("Bitte Regal des Buches eingeben");
+		}
 		this.shelf = shelf;
 	}
 	
 	@Override
 	public String toString() {
 		return title + ", " + author + ", " + publisher;
+	}
+	
+	private void doNotify() {
+		setChanged();
+		notifyObservers();
 	}
 }

@@ -29,7 +29,7 @@ public class CopyListModel extends AbstractListModel implements Observer {
 		if(!library.isCopyLent(currentCopy) || loan == null) { return " verfuegbar"; }
 		else {
 			if (!loan.isOverdue()) { return " Ausgeliehen bis " + getDateString(loan.getReturnDate()) + " (noch " + loan.getDaysOfLoanDuration() + " Tage)"; }
-			else { return " Ausleihe f‰llig seit " + loan.getDaysOverdue() + " Tagen"; }
+			else { return " Ausleihe f√§llig seit " + loan.getDaysOverdue() + " Tagen"; }
 		}
 	}
 	
