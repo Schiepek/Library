@@ -96,8 +96,7 @@ public class BookDetail extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-		
-		
+
 		JPanel bookInformationJPanel = new JPanel();
 		bookInformationJPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
 		bookInformationJPanel.setBorder(new TitledBorder(null, "Buch Informationen", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -257,11 +256,7 @@ public class BookDetail extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (currentBook.getName().isEmpty()) {
 					try {
-						BookDetail.this.currentBook.setName(titleJTextField.getText());
-						BookDetail.this.currentBook.setAuthor(authorJTextField.getText());
-						BookDetail.this.currentBook.setPublisher(publisherJTextField.getText());
-						BookDetail.this.currentBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
-						createNewCopy();
+						createNewBook();
 						saveJButton.setVisible(true);
 						errorJLabel.setVisible(false);
 					} catch (IllegalArgumentException ex) {
@@ -304,16 +299,17 @@ public class BookDetail extends JFrame {
 		copyList.setModel(copyModel);
 	}
 	
-//	private void createNewBook() {
-//		Book addedBook = library.createAndAddBook(titleJTextField.getText());
-//		addedBook.setAuthor(authorJTextField.getText());
-//		addedBook.setPublisher(publisherJTextField.getText());
-//		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
-//		currentBook = addedBook;
-//		copyModel = new CopyListModel(library, currentBook);
-//		copyList.setModel(copyModel);
-//		createNewCopy();
-//	}
+	private void createNewBook() {
+		Book addedBook = library.createAndAddBook(titleJTextField.getText());
+		addedBook.setName(titleJTextField.getText());
+		addedBook.setAuthor(authorJTextField.getText());
+		addedBook.setPublisher(publisherJTextField.getText());
+		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
+		currentBook = addedBook;
+		copyModel = new CopyListModel(library, currentBook);
+		copyList.setModel(copyModel);
+		createNewCopy();
+	}
 	
 	private void createNewCopy() {
 		library.createAndAddCopy(currentBook);
