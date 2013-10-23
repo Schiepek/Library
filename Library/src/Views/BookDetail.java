@@ -300,12 +300,13 @@ public class BookDetail extends JFrame {
 	}
 	
 	private void createNewBook() {
-		Book addedBook = library.createAndAddBook(titleJTextField.getText());
+		Book addedBook = new Book(titleJTextField.getText());
 		addedBook.setName(titleJTextField.getText());
 		addedBook.setAuthor(authorJTextField.getText());
 		addedBook.setPublisher(publisherJTextField.getText());
 		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
 		currentBook = addedBook;
+		library.addBook(currentBook);
 		copyModel = new CopyListModel(library, currentBook);
 		copyList.setModel(copyModel);
 		createNewCopy();

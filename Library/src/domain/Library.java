@@ -43,6 +43,11 @@ public class Library extends Observable{
 		doNotify();
 		return b;
 	}
+	
+	public void addBook(Book book) {
+		books.add(book);
+		doNotify();
+	}
 
 	public Copy createAndAddCopy(Book title) {
 		Copy c = new Copy(title);
