@@ -195,7 +195,7 @@ public class BookMaster extends JFrame{
 		
 		statisticJPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
-		bookCountJLabel = new JLabel("Anzahl Buecher: " + library.getBooks().size());
+		bookCountJLabel = new JLabel("Anzahl Bücher: " + library.getBooks().size());
 		statisticJPanel.add(bookCountJLabel);
 		
 		copiesCountJLabel = new JLabel("Anzahl Exemplare: " + library.getCopies().size());
