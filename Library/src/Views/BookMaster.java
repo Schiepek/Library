@@ -212,7 +212,7 @@ public class BookMaster extends JFrame{
 	}
 	
 	private void refreshLabelCount() {
-		bookCountJLabel.setText("Anzahl Buecher: " + library.getBooks().size());
+		bookCountJLabel.setText("Anzahl Bücher: " + library.getBooks().size());
 		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
 	}	
 	

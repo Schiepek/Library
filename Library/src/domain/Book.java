@@ -17,7 +17,7 @@ public class Book extends Observable {
 	}
 
 	public void setName(String name) {
-		if (name.isEmpty() || name == "") {
+		if (name.isEmpty()) {
 			throw new IllegalArgumentException("Bitte Titel des Buches eingeben");
 		}
 		this.title = name;
@@ -29,7 +29,7 @@ public class Book extends Observable {
 	}
 
 	public void setAuthor(String autor) {
-		if (autor.isEmpty() || autor == "") {
+		if (autor.isEmpty()) {
 			throw new IllegalArgumentException("Bitte Autor des Buches eingeben");
 		}
 		this.author = autor;
@@ -41,7 +41,7 @@ public class Book extends Observable {
 	}
 
 	public void setPublisher(String publisher) {
-		if (publisher.isEmpty() || publisher == "") {
+		if (publisher.isEmpty()) {
 			throw new IllegalArgumentException("Bitte Verlag des Buches eingeben");
 		}
 		this.publisher = publisher;
