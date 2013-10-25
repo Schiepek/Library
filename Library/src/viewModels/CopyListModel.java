@@ -16,7 +16,7 @@ public class CopyListModel extends AbstractListModel implements Observer {
 	
 	private Library library;
 	private Book currentBook;
-	private List<Copy> copyList;
+
 	
 	public CopyListModel(Library library , Book book) {
 		library.addObserver(this);
@@ -53,10 +53,6 @@ public class CopyListModel extends AbstractListModel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		fireContentsChanged(this, 0 , library.getCopiesOfBook(currentBook).size());
-	}
-	
-	public List<Copy> getCopyList() {
-		return copyList;
 	}
 
 

@@ -93,14 +93,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 		}
 		if(available != 0) return Integer.toString(available);
 		return "ab " + getDateString(nextDate);
-		
-		
-//		Loan loan = library.getLoan(currentCopy);
-//		if(!library.isCopyLent(currentCopy) || loan == null) { return " verfuegbar"; }
-//		else {
-//			if (!loan.isOverdue()) { return " Ausgeliehen bis " + getDateString(loan.getReturnDate()) + " (noch " + loan.getDaysOfLoanDuration() + " Tage)"; }
-//			else { return " Ausleihe fällig seit " + loan.getDaysOverdue() + " Tagen"; }
-//		}
 	}
 	
 	private String getDateString(GregorianCalendar date) {

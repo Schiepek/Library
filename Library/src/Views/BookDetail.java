@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -35,6 +36,7 @@ import domain.Library;
 import javax.swing.JComboBox;
 
 import viewModels.CopyListModel;
+import viewModels.CopyTableModel;
 import domain.Shelf;
 
 import javax.swing.JScrollPane;
@@ -62,13 +64,14 @@ public class BookDetail extends JFrame {
 	private Library library;
 	private Book currentBook;
 	private JButton removeSelectedJButton;
-	private JList copyList;
+	private JTable copyTable;
 	private JLabel titleJLabel;
-	private CopyListModel copyModel;
+	private CopyTableModel copyModel;
 	private JButton saveJButton;
 	private JButton addCopyJButton;
 	private ImageIcon erImage = new ImageIcon("src/erroricon.png");
 	private JLabel errorJLabel;
+	private JScrollPane scrollPane;
 
 	public BookDetail(Library library , Book currentBook) {
 		super();
@@ -240,7 +243,7 @@ public class BookDetail extends JFrame {
 		removeSelectedJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				deleteCopy();
-				if (copyList.getSelectedIndex() == -1) {
+				if (copyTable.getSelectedRow() == -1) {
 					removeSelectedJButton.setEnabled(false);
 				}
 			}
@@ -274,9 +277,8 @@ public class BookDetail extends JFrame {
 		gbc_addCopyButton.gridx = 2;
 		gbc_addCopyButton.gridy = 0;
 		exampleJPanel.add(addCopyJButton, gbc_addCopyButton);
-		copyModel = new CopyListModel(library, currentBook);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridwidth = 3;
@@ -285,19 +287,23 @@ public class BookDetail extends JFrame {
 		gbc_scrollPane.gridy = 1;
 		exampleJPanel.add(scrollPane, gbc_scrollPane);
 		
-		copyList = new JList();
-		copyList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (copyList.getSelectedIndices().length > 0) {
+		
+		copyModel = new CopyTableModel(library, currentBook);
+		copyTable = new JTable();
+		scrollPane.setViewportView(copyTable);
+		copyTable.setModel(copyModel);
+		copyTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (copyTable.getSelectedRows().length > 0) {
 					removeSelectedJButton.setEnabled(true);
 				} else {
 					removeSelectedJButton.setEnabled(false);
 				}
-			}
+			}			
 		});
-		scrollPane.setViewportView(copyList);
-		copyList.setModel(copyModel);
 	}
+	
 	
 	private void createNewBook() {
 		Book addedBook = new Book(titleJTextField.getText());
@@ -307,8 +313,8 @@ public class BookDetail extends JFrame {
 		addedBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
 		currentBook = addedBook;
 		library.addBook(currentBook);
-		copyModel = new CopyListModel(library, currentBook);
-		copyList.setModel(copyModel);
+		copyModel = new CopyTableModel(library, currentBook);
+		copyTable.setModel(copyModel);
 		createNewCopy();
 	}
 	
@@ -318,7 +324,7 @@ public class BookDetail extends JFrame {
 	
 	private void deleteCopy() {
 		if (library.bookExists(currentBook)) {
-			int[] selected = copyList.getSelectedIndices();
+			int[] selected = copyTable.getSelectedRows();
 			ArrayList<Copy> selectedCopies = new ArrayList<>();
 			for(int s : selected) {
 				selectedCopies.add(library.getCopiesOfBook(currentBook).get(s));
@@ -327,7 +333,7 @@ public class BookDetail extends JFrame {
 			if(!library.bookExists(currentBook)) {
 				this.dispose();
 			}
-			copyList.clearSelection();
+			copyTable.clearSelection();
 		}
 	}
 
