@@ -53,6 +53,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class BookDetail extends JFrame {
 
@@ -72,6 +73,7 @@ public class BookDetail extends JFrame {
 	private ImageIcon erImage = new ImageIcon("src/erroricon.png");
 	private JLabel errorJLabel;
 	private JScrollPane scrollPane;
+	private JLabel quantityLabel;
 
 	public BookDetail(Library library , Book currentBook) {
 		super();
@@ -230,7 +232,7 @@ public class BookDetail extends JFrame {
 		gbl_ExamplePanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		exampleJPanel.setLayout(gbl_ExamplePanel);
 		
-		JLabel quantityLabel = new JLabel("Anzahl: " + library.getCopiesOfBook(currentBook).size());
+		quantityLabel = new JLabel("Anzahl: " + library.getCopiesOfBook(currentBook).size());
 		GridBagConstraints gbc_quantityLabel = new GridBagConstraints();
 		gbc_quantityLabel.anchor = GridBagConstraints.WEST;
 		gbc_quantityLabel.insets = new Insets(0, 0, 5, 5);
@@ -301,8 +303,23 @@ public class BookDetail extends JFrame {
 					removeSelectedJButton.setEnabled(false);
 				}
 			}			
-		});
-	}
+		});		
+		copyTable.getColumnModel().getColumn(0).setMaxWidth(50);
+		copyTable.getColumnModel().getColumn(1).setMaxWidth(180);
+		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		copyTable.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+		copyTable.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+		
+		
+		
+	
+}
+	
+
+	
+	
 	
 	
 	private void createNewBook() {
@@ -316,10 +333,12 @@ public class BookDetail extends JFrame {
 		copyModel = new CopyTableModel(library, currentBook);
 		copyTable.setModel(copyModel);
 		createNewCopy();
+
 	}
 	
 	private void createNewCopy() {
 		library.createAndAddCopy(currentBook);
+		refreshLabelCount();
 	}
 	
 	private void deleteCopy() {
@@ -334,7 +353,12 @@ public class BookDetail extends JFrame {
 				this.dispose();
 			}
 			copyTable.clearSelection();
+			refreshLabelCount();
 		}
+	}
+	
+	private void refreshLabelCount() {
+		quantityLabel.setText("Anzahl: " + library.getCopiesOfBook(currentBook).size());
 	}
 
 }

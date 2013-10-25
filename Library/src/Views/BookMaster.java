@@ -9,7 +9,6 @@ import javax.swing.border.EmptyBorder;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JLayeredPane;
-
 import javax.swing.BoxLayout;
 
 import java.awt.Dimension;
@@ -22,6 +21,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -43,6 +45,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
@@ -221,6 +224,17 @@ public class BookMaster extends JFrame{
 				}
 			}
 		});
+		bookTableModel.addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent arg0) {
+				refreshLabelCount();				
+			}			
+		});
+		
+		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		bookJTable.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
 
 		
 		statisticJPanel.setLayout(new GridLayout(0, 2, 0, 0));
@@ -257,10 +271,10 @@ public class BookMaster extends JFrame{
 
 	}
 	
-//	private void refreshLabelCount() {
-//		bookCountJLabel.setText("Anzahl Bücher: " + library.getBooks().size());
-//		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
-//	}
+	private void refreshLabelCount() {
+		bookCountJLabel.setText("Anzahl Bücher: " + library.getBooks().size());
+		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
+	}
 	
 	public void applyFilter() {
 		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>();
