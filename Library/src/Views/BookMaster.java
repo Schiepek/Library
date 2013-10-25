@@ -6,48 +6,39 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import java.awt.CardLayout;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JLayeredPane;
 
-import java.awt.FlowLayout;
-
 import javax.swing.BoxLayout;
 
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 
 import java.awt.Font;
 
-import javax.swing.JList;
 import javax.swing.JButton;
 
-import viewModels.BookListModel;
 import viewModels.BookTableModel;
-import domain.Book;
 import domain.Library;
 
 import java.awt.Insets;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
@@ -57,18 +48,24 @@ import javax.swing.JTextField;
 
 public class BookMaster extends JFrame{
 
+
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JList bookJList;
 	private Library library;
-	private BookTableModel bookTableModel;
+	//private BookTableModel bookTableModel;
 	private JLabel bookCountJLabel;
 	private JLabel copiesCountJLabel;
 	private JButton showSelectedJButton;
 	private JTable bookJTable;
-	private JTextField txtSearchjtextfield;
+	private JCheckBox availableJCheckBox;
+	private JTextField searchJTextField;
+	private TableRowSorter<BookTableModel> sorter;
+	private RowFilter<Object, Object> filter;
+	private boolean showAvailable = true;
 
 	public BookMaster(Library library) {
 		super();
+		setTitle("Swinging Library");
 		this.library = library;
 		
 		initGUI();
@@ -131,22 +128,43 @@ public class BookMaster extends JFrame{
 			}
 		});
 		
-		txtSearchjtextfield = new JTextField();
-		txtSearchjtextfield.setText("Suche");
-		GridBagConstraints gbc_txtSearchjtextfield = new GridBagConstraints();
-		gbc_txtSearchjtextfield.insets = new Insets(0, 0, 5, 5);
-		gbc_txtSearchjtextfield.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtSearchjtextfield.gridx = 1;
-		gbc_txtSearchjtextfield.gridy = 0;
-		inventoryJPanel.add(txtSearchjtextfield, gbc_txtSearchjtextfield);
-		txtSearchjtextfield.setColumns(10);
+		searchJTextField = new JTextField();
+		searchJTextField.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				applyFilter();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				applyFilter();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {}
+			
+		});
+		GridBagConstraints gbc_searchJTextField = new GridBagConstraints();
+		gbc_searchJTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_searchJTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_searchJTextField.gridx = 1;
+		gbc_searchJTextField.gridy = 0;
+		inventoryJPanel.add(searchJTextField, gbc_searchJTextField);
+		searchJTextField.setColumns(10);
 		
-		JCheckBox chckbxAvailablejcheckbox = new JCheckBox("nur verfügbare");
-		GridBagConstraints gbc_chckbxAvailablejcheckbox = new GridBagConstraints();
-		gbc_chckbxAvailablejcheckbox.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxAvailablejcheckbox.gridx = 2;
-		gbc_chckbxAvailablejcheckbox.gridy = 0;
-		inventoryJPanel.add(chckbxAvailablejcheckbox, gbc_chckbxAvailablejcheckbox);
+		availableJCheckBox = new JCheckBox("nur verfügbare");
+		availableJCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showAvailable = !showAvailable;
+				applyFilter();
+			}
+		});
+		GridBagConstraints gbc_AvailableJCheckBox = new GridBagConstraints();
+		gbc_AvailableJCheckBox.insets = new Insets(0, 0, 5, 5);
+		gbc_AvailableJCheckBox.gridx = 2;
+		gbc_AvailableJCheckBox.gridy = 0;
+		inventoryJPanel.add(availableJCheckBox, gbc_AvailableJCheckBox);
 		GridBagConstraints gbc_showSelectedJButton = new GridBagConstraints();
 		gbc_showSelectedJButton.insets = new Insets(0, 0, 5, 5);
 		gbc_showSelectedJButton.gridx = 3;
@@ -176,6 +194,18 @@ public class BookMaster extends JFrame{
 		gbc_scrollPane.gridy = 1;
 		inventoryJPanel.add(scrollPane, gbc_scrollPane);
 		bookJTable = new JTable();
+		bookJTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2)  {
+					if(bookJTable.getSelectedRow() != -1)  {
+						 if (e.getClickCount() == 2) {
+							 new BookDetail(library, library.getBooks().get(bookJTable.getSelectedRow()));
+						 }
+				     }
+				}
+			}
+		});
 		scrollPane.setViewportView(bookJTable);
 		bookJTable.setModel(bookTableModel);
 		bookJTable.getTableHeader().setReorderingAllowed(false);
@@ -208,12 +238,34 @@ public class BookMaster extends JFrame{
 		titleJLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		contentPane.add(titleJLabel, BorderLayout.NORTH);
 		
+		
+		
+		sorter = new TableRowSorter<BookTableModel>(bookTableModel);
+		bookJTable.setRowSorter(sorter);
+		
+		filter = new RowFilter<Object, Object>() {
+	        public boolean include(Entry entry) {
+	        	if (showAvailable){
+	        		return true;
+	        	}
+	        	return (((String) entry.getValue(0)).matches("[0-9]+"));
+	        }
+	    };
+	    
+	    sorter.setRowFilter(filter);
+		
 
 	}
 	
-	private void refreshLabelCount() {
-		bookCountJLabel.setText("Anzahl Bücher: " + library.getBooks().size());
-		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
-	}	
+//	private void refreshLabelCount() {
+//		bookCountJLabel.setText("Anzahl Bücher: " + library.getBooks().size());
+//		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
+//	}
 	
+	public void applyFilter() {
+		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>();
+		filters.add(filter);
+		filters.add(RowFilter.regexFilter("(?i)" + searchJTextField.getText()));
+		sorter.setRowFilter(RowFilter.andFilter(filters));
+	}
 }
