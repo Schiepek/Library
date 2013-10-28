@@ -71,7 +71,26 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		fireTableDataChanged();	
+		fireTableDataChanged();
+		int bookPos = library.getEditedBookPos();
+		System.out.println("edited = " + bookPos);
+		if (bookPos>=0){
+			fireTableRowsUpdated(bookPos, bookPos);
+		}else{
+			bookPos = library.getRemovedBookIndex();
+			System.out.println("removed = " + bookPos);
+			if (bookPos>=0){
+				fireTableRowsDeleted(bookPos, bookPos);
+			}else{
+				bookPos = library.getInsertedBookIndex();
+				System.out.println("inserted = " + bookPos);
+				if (bookPos>=0){
+				//	fireTableRowsInserted(bookPos, bookPos); //hier ist noch ein Bug
+				}else{
+					fireTableDataChanged();
+				}
+			}
+		}
 	}
 	
 	@Override

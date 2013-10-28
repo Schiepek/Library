@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Library extends Observable{
+public class Library extends Observable implements Observer{
 
 	private List<Copy> copies;
 	private List<Customer> customers;
 	private List<Loan> loans;
 	private List<Book> books;
+	
+	private int editedBookIndex;
+	private int addBookIndex;
+	private int removeBookIndex;
 
 	public Library() {
 		copies = new ArrayList<Copy>();
@@ -39,13 +43,25 @@ public class Library extends Observable{
 
 	public Book createAndAddBook(String name) {
 		Book b = new Book(name);
+		b.addObserver(this);
 		books.add(b);
+		
+		addBookIndex=books.indexOf(b);
+		editedBookIndex=-1;
+		removeBookIndex=-1;
+		
 		doNotify();
 		return b;
 	}
 	
 	public void addBook(Book book) {
+		book.addObserver(this);
 		books.add(book);
+		
+		addBookIndex=books.indexOf(book);
+		editedBookIndex=-1;
+		removeBookIndex=-1;
+		
 		doNotify();
 	}
 
@@ -157,7 +173,13 @@ public class Library extends Observable{
 	}
 	
 	public void removeBook(Book book) {
+		book.deleteObserver(this);
 		books.remove(book);
+		
+		removeBookIndex=books.indexOf(book);
+		editedBookIndex=-1;
+		addBookIndex=-1;
+		
 		doNotify();
 	}
 
@@ -177,6 +199,18 @@ public class Library extends Observable{
 		return customers;
 	}
 	
+	public int getEditedBookPos() {
+		return editedBookIndex;
+	}
+
+	public int getInsertedBookIndex() {
+		return addBookIndex;
+	}
+
+	public int getRemovedBookIndex() {
+		return removeBookIndex;
+	}
+	
 	public boolean bookExists(Book book) {
 		for(Book tempBook : getBooks()) {
 			if (tempBook.equals(book)) { return true; }
@@ -187,6 +221,17 @@ public class Library extends Observable{
 	private void doNotify() {
 		setChanged();
 		notifyObservers();
+	}
+
+	@Override
+	public void update(Observable book, Object arg1) {
+		editedBookIndex=books.indexOf(book);	
+		addBookIndex=-1;
+		removeBookIndex=-1;
+
+		setChanged();
+		notifyObservers(book);
+		
 	}
 
 }
