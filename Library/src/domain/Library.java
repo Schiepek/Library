@@ -137,6 +137,14 @@ public class Library extends Observable implements Observer{
 	public List<Copy> getLentOutBooks(){
 		return getCopies(true);
 	}
+	
+	public List<Loan> getLentOutLoans(){
+		List<Loan> lentLoans = new ArrayList<Loan>();
+		for (Loan loan : loans) {
+			if(loan.isLent()) { lentLoans.add(loan); }
+		}
+		return lentLoans;
+	}
 
 	private List<Copy> getCopies(boolean isLent) {
 		List<Copy> retCopies = new ArrayList<Copy>();
@@ -149,9 +157,9 @@ public class Library extends Observable implements Observer{
 	}
 	
 	public Loan getLoan(Copy copy) {
-		if (isCopyLent(copy)) {
-			for(Loan tempLoan : getLoans()) {
-				if(copy.equals(tempLoan.getCopy())) { return tempLoan; }
+		for (Loan l : loans) {
+			if (l.getCopy().equals(copy) && l.isLent()) {
+				return l;
 			}
 		}
 		return null;

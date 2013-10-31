@@ -88,6 +88,22 @@ public class Loan {
 		return -1;
 	}
 	
+	public GregorianCalendar getLatestReturnDate() {
+		if (isLent()) {
+			GregorianCalendar latestDate = (GregorianCalendar) pickupDate.clone();
+			latestDate.add(GregorianCalendar.DAY_OF_YEAR, DAYS_TO_RETURN_BOOK);
+			return latestDate;
+		}
+		else return null;
+	}
+	
+	public int getDaysTillReturn() {
+		if (isLent() && !isOverdue()) {
+			return (int) ((getLatestReturnDate().getTimeInMillis() - System.currentTimeMillis()) / 1000 /60 /60 /24);
+		}
+		return 0;
+	}
+	
 	public int getDaysOverdue() {
 		if ( !isOverdue() )
 			return 0;
@@ -95,8 +111,8 @@ public class Loan {
 		GregorianCalendar dueDate = (GregorianCalendar) pickupDate.clone();
 		dueDate.add(GregorianCalendar.DAY_OF_YEAR, DAYS_TO_RETURN_BOOK);
 		
-		return (int) (new GregorianCalendar().getTimeInMillis() - 
-				dueDate.getTimeInMillis())/ 1000 /60 /60 /24;
+		return (int) ((new GregorianCalendar().getTimeInMillis() - 
+				dueDate.getTimeInMillis())/ 1000 /60 /60 /24);
 	}
 	
 	public boolean isOverdue() {

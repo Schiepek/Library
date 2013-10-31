@@ -1,5 +1,7 @@
 package viewModels;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Observable;
@@ -71,21 +73,18 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		fireTableDataChanged();
 		int bookPos = library.getEditedBookPos();
-		System.out.println("edited = " + bookPos);
 		if (bookPos>=0){
 			fireTableRowsUpdated(bookPos, bookPos);
 		}else{
 			bookPos = library.getRemovedBookIndex();
-			System.out.println("removed = " + bookPos);
 			if (bookPos>=0){
 				fireTableRowsDeleted(bookPos, bookPos);
 			}else{
 				bookPos = library.getInsertedBookIndex();
-				System.out.println("inserted = " + bookPos);
 				if (bookPos>=0){
-				//	fireTableRowsInserted(bookPos, bookPos); //hier ist noch ein Bug
+					fireTableDataChanged();
+					//fireTableRowsInserted(bookPos, bookPos); //hier ist noch ein Bug
 				}else{
 					fireTableDataChanged();
 				}
@@ -101,21 +100,25 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 	
 	private String getLoanInformation(List<Copy> copylist) {
 		int available = 0;
-		GregorianCalendar nextDate = new GregorianCalendar(99999,1,1);
+		GregorianCalendar nextDate = new GregorianCalendar(00,00,00);
 		for (Copy copy : copylist) {
 			Loan loan = library.getLoan(copy);
 			if(!library.isCopyLent(copy) || loan == null) { available++; }
 			else if(!library.getLoan(copy).isOverdue()) { 
-				if(nextDate.after(loan.getReturnDate())) { nextDate = loan.getReturnDate(); }
+				if(nextDate.before(loan.getLatestReturnDate())) { nextDate = loan.getLatestReturnDate(); }
 			}
-			else { return "überzogen"; }
+			else { return "seit " + getDateString(loan.getLatestReturnDate()); }
 		}
 		if(available != 0) return Integer.toString(available);
 		return "ab " + getDateString(nextDate);
 	}
 	
 	private String getDateString(GregorianCalendar date) {
-		return date.get(date.DATE) + "." + date.get(date.MONTH) + "." + date.get(date.YEAR);
+		if (date != null) {
+			DateFormat f = SimpleDateFormat.getDateInstance();
+			return f.format(date.getTime());
+		}
+		return "00.00.00";
 	}
 
 }

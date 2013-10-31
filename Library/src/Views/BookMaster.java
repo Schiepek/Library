@@ -36,10 +36,15 @@ import java.awt.Font;
 import javax.swing.JButton;
 
 import viewModels.BookTableModel;
+import viewModels.LoanTableModel;
 import domain.Library;
+import domain.Loan;
 
 import java.awt.Insets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -49,22 +54,34 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
+import java.awt.Component;
+
 public class BookMaster extends JFrame{
 
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private Library library;
-	//private BookTableModel bookTableModel;
+	private BookTableModel bookTableModel;
 	private JLabel bookCountJLabel;
 	private JLabel copiesCountJLabel;
-	private JButton showSelectedJButton;
+	private JButton showSelectedBookJButton;
 	private JTable bookJTable;
 	private JCheckBox availableJCheckBox;
-	private JTextField searchJTextField;
-	private TableRowSorter<BookTableModel> sorter;
-	private RowFilter<Object, Object> filter;
+	private JTextField searchBookJTextField;
+	private TableRowSorter<BookTableModel> bookSorter;
+	private TableRowSorter<LoanTableModel> loanSorter;
+	private RowFilter<Object, Object> availableFilter;
+	private RowFilter<Object, Object> overdueFilter;
 	private boolean showAvailable = true;
+	private boolean showOverdue = true;
+	private JTextField searchLoanJTextField;
+	private JTable loanJTable;
+	private LoanTableModel loanTableModel;
+	private JButton showSelectedLoanJButton;
+	private JLabel countLoanJLabel;
+	private JLabel currentLoanJLabel;
+	private JLabel overdueLoanJLabel;	
 
 	public BookMaster(Library library) {
 		super();
@@ -78,8 +95,8 @@ public class BookMaster extends JFrame{
 	
 	private void initGUI() {
 		
-		this.setMinimumSize(new Dimension(800, 500));
-		BookTableModel bookTableModel= new BookTableModel(library);
+		this.setMinimumSize(new Dimension(1200, 700));
+		bookTableModel= new BookTableModel(library);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 633, 474);
@@ -112,36 +129,36 @@ public class BookMaster extends JFrame{
 		inventoryJPanel.setLayout(gbl_inventoryJPanel);
 
 		
-		final JLabel selectedJLabel = new JLabel("Ausgewaehlt: 0");
-		selectedJLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		final JLabel selectedBookJLabel = new JLabel("Ausgewählt: 0");
+		selectedBookJLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		GridBagConstraints gbc_selectedJLabel = new GridBagConstraints();
 		gbc_selectedJLabel.anchor = GridBagConstraints.WEST;
 		gbc_selectedJLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_selectedJLabel.gridx = 0;
 		gbc_selectedJLabel.gridy = 0;
-		inventoryJPanel.add(selectedJLabel, gbc_selectedJLabel);
+		inventoryJPanel.add(selectedBookJLabel, gbc_selectedJLabel);
 		
-		showSelectedJButton = new JButton("Selektierte Anzeigen");
-		showSelectedJButton.setEnabled(false);
-		showSelectedJButton.addActionListener(new ActionListener() {
+		showSelectedBookJButton = new JButton("Selektierte Anzeigen");
+		showSelectedBookJButton.setEnabled(false);
+		showSelectedBookJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(int i : bookJTable.getSelectedRows()) {
-					new BookDetail(library, library.getBooks().get(i));
+					new BookDetail(library, library.getBooks().get(bookJTable.convertRowIndexToModel(i)));
 				}
 			}
 		});
 		
-		searchJTextField = new JTextField();
-		searchJTextField.getDocument().addDocumentListener(new DocumentListener() {
+		searchBookJTextField = new JTextField();
+		searchBookJTextField.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				applyFilter();
+				applyBookFilter();
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				applyFilter();
+				applyBookFilter();
 			}
 
 			@Override
@@ -153,14 +170,14 @@ public class BookMaster extends JFrame{
 		gbc_searchJTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_searchJTextField.gridx = 1;
 		gbc_searchJTextField.gridy = 0;
-		inventoryJPanel.add(searchJTextField, gbc_searchJTextField);
-		searchJTextField.setColumns(10);
+		inventoryJPanel.add(searchBookJTextField, gbc_searchJTextField);
+		searchBookJTextField.setColumns(10);
 		
 		availableJCheckBox = new JCheckBox("nur verfügbare");
 		availableJCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showAvailable = !showAvailable;
-				applyFilter();
+				applyBookFilter();
 			}
 		});
 		GridBagConstraints gbc_AvailableJCheckBox = new GridBagConstraints();
@@ -172,13 +189,12 @@ public class BookMaster extends JFrame{
 		gbc_showSelectedJButton.insets = new Insets(0, 0, 5, 5);
 		gbc_showSelectedJButton.gridx = 3;
 		gbc_showSelectedJButton.gridy = 0;
-		inventoryJPanel.add(showSelectedJButton, gbc_showSelectedJButton);
+		inventoryJPanel.add(showSelectedBookJButton, gbc_showSelectedJButton);
 		
 		JButton newBookJButton = new JButton("Neues Buch hinzufügen");
 		newBookJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new BookDetail(library, null);
-					//initBookDetail(null);
 			}
 		});
 		GridBagConstraints gbc_newBookJButton = new GridBagConstraints();
@@ -203,7 +219,7 @@ public class BookMaster extends JFrame{
 				if(e.getClickCount() == 2)  {
 					if(bookJTable.getSelectedRow() != -1)  {
 						 if (e.getClickCount() == 2) {
-							 new BookDetail(library, library.getBooks().get(bookJTable.getSelectedRow()));
+							 new BookDetail(library, library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));
 						 }
 				     }
 				}
@@ -216,26 +232,23 @@ public class BookMaster extends JFrame{
 		bookJTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
-				selectedJLabel.setText("Ausgewaehlt: " + bookJTable.getSelectedRowCount());
+				selectedBookJLabel.setText("Ausgewählt: " + bookJTable.getSelectedRowCount());
 				if (bookJTable.getSelectedRowCount() > 0) {
-					showSelectedJButton.setEnabled(true);
+					showSelectedBookJButton.setEnabled(true);
 				} else {
-					showSelectedJButton.setEnabled(false);
+					showSelectedBookJButton.setEnabled(false);
 				}
 			}
 		});
 		bookTableModel.addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent arg0) {
-				refreshLabelCount();				
+				refreshBookLabelCount();				
 			}			
 		});
 		
-		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);		
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-		bookJTable.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-
+		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);
+		bookJTable.getColumnModel().getColumn(0).setMinWidth(100);
 		
 		statisticJPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
@@ -246,18 +259,19 @@ public class BookMaster extends JFrame{
 		statisticJPanel.add(copiesCountJLabel);
 		JLayeredPane loanLayeredPane = new JLayeredPane();
 		tabbedPane.addTab("Ausleihen", null, loanLayeredPane, null);
+		loanLayeredPane.setLayout(new BoxLayout(loanLayeredPane, BoxLayout.Y_AXIS));
+		
+
 		
 		JLabel titleJLabel = new JLabel("Swinging Library");
 		titleJLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		titleJLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		contentPane.add(titleJLabel, BorderLayout.NORTH);
 		
+		bookSorter = new TableRowSorter<BookTableModel>(bookTableModel);
+		bookJTable.setRowSorter(bookSorter);
 		
-		
-		sorter = new TableRowSorter<BookTableModel>(bookTableModel);
-		bookJTable.setRowSorter(sorter);
-		
-		filter = new RowFilter<Object, Object>() {
+		availableFilter = new RowFilter<Object, Object>() {
 	        public boolean include(Entry entry) {
 	        	if (showAvailable){
 	        		return true;
@@ -266,20 +280,199 @@ public class BookMaster extends JFrame{
 	        }
 	    };
 	    
-	    sorter.setRowFilter(filter);
+	    bookSorter.setRowFilter(availableFilter);
+	    
+		JPanel loanstatisticJPanel = new JPanel();
+		loanstatisticJPanel.setBorder(new TitledBorder(null, "Ausleihe Statistiken", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		loanstatisticJPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
+		loanLayeredPane.add(loanstatisticJPanel);
+		loanstatisticJPanel.setLayout(new GridLayout(1, 0, 0, 0));
+		
+		countLoanJLabel = new JLabel("Anzahl Ausleihen: " + library.getLoans().size());
+		loanstatisticJPanel.add(countLoanJLabel);
+		
+		currentLoanJLabel = new JLabel("Aktuell Ausgeliehen: " + library.getLentOutBooks().size());
+		loanstatisticJPanel.add(currentLoanJLabel);
+		
+		overdueLoanJLabel = new JLabel("Überfällige Ausleihen: " + library.getOverdueLoans().size());
+		loanstatisticJPanel.add(overdueLoanJLabel);
+		
+		JPanel collectedloanJPanel = new JPanel();
+		collectedloanJPanel.setBorder(new TitledBorder(null, "Erfasste Ausleihen", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		loanLayeredPane.add(collectedloanJPanel);
+		GridBagLayout gbl_collectedloanJPanel = new GridBagLayout();
+		gbl_collectedloanJPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
+		gbl_collectedloanJPanel.rowHeights = new int[]{0, 0, 0};
+		gbl_collectedloanJPanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_collectedloanJPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		collectedloanJPanel.setLayout(gbl_collectedloanJPanel);
+		
+		final JLabel selectedLoanJLabel = new JLabel("Ausgewählt: 0");
+		selectedLoanJLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_selectedLoanJLabel = new GridBagConstraints();
+		gbc_selectedLoanJLabel.anchor = GridBagConstraints.WEST;
+		gbc_selectedLoanJLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_selectedLoanJLabel.gridx = 0;
+		gbc_selectedLoanJLabel.gridy = 0;
+		collectedloanJPanel.add(selectedLoanJLabel, gbc_selectedLoanJLabel);
+		
+		searchLoanJTextField = new JTextField();
+		GridBagConstraints gbc_searchLoanJTextField = new GridBagConstraints();
+		gbc_searchLoanJTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_searchLoanJTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_searchLoanJTextField.gridx = 1;
+		gbc_searchLoanJTextField.gridy = 0;
+		collectedloanJPanel.add(searchLoanJTextField, gbc_searchLoanJTextField);
+		searchLoanJTextField.setColumns(10);
+		searchLoanJTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				applyLoanFilter();
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				applyLoanFilter();
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {}			
+		});
+
+		JCheckBox overdueJCheckBox = new JCheckBox("Nur Überfällige");
+		GridBagConstraints gbc_overdueJCheckBox = new GridBagConstraints();
+		gbc_overdueJCheckBox.insets = new Insets(0, 0, 5, 5);
+		gbc_overdueJCheckBox.gridx = 2;
+		gbc_overdueJCheckBox.gridy = 0;
+		collectedloanJPanel.add(overdueJCheckBox, gbc_overdueJCheckBox);
+		overdueJCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showOverdue = !showOverdue;
+				applyLoanFilter();
+			}
+		});
+		
+		showSelectedLoanJButton = new JButton("Selektierte Ausleihe anzeigen");
+		showSelectedLoanJButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		showSelectedLoanJButton.setEnabled(false);
+		showSelectedLoanJButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for(int i : loanJTable.getSelectedRows()) {
+					new LoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(i)));
+				}
+			}
+		});
+		
+		GridBagConstraints gbc_showSelectedLoanJButton = new GridBagConstraints();
+		gbc_showSelectedLoanJButton.insets = new Insets(0, 0, 5, 5);
+		gbc_showSelectedLoanJButton.gridx = 3;
+		gbc_showSelectedLoanJButton.gridy = 0;
+		collectedloanJPanel.add(showSelectedLoanJButton, gbc_showSelectedLoanJButton);
+		
+		JButton newLoanJButton = new JButton("Neue Ausleihe erfassen");
+		GridBagConstraints gbc_newLoanJButton = new GridBagConstraints();
+		gbc_newLoanJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_newLoanJButton.gridx = 4;
+		gbc_newLoanJButton.gridy = 0;
+		collectedloanJPanel.add(newLoanJButton, gbc_newLoanJButton);
+		newLoanJButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new LoanDetail(null);
+			}
+		});
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
+		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_1.gridwidth = 5;
+		gbc_scrollPane_1.insets = new Insets(0, 0, 0, 5);
+		gbc_scrollPane_1.gridx = 0;
+		gbc_scrollPane_1.gridy = 1;
+		collectedloanJPanel.add(scrollPane_1, gbc_scrollPane_1);
+		
+		loanJTable = new JTable();
+		loanJTable.getTableHeader().setReorderingAllowed(false);
+		scrollPane_1.setViewportView(loanJTable);
+		loanTableModel = new LoanTableModel(library);
+		loanJTable.setModel(loanTableModel);
+		loanJTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				selectedLoanJLabel.setText("Ausgewählt: " + loanJTable.getSelectedRowCount());
+				if (loanJTable.getSelectedRowCount() > 0) {
+					showSelectedLoanJButton.setEnabled(true);
+				} else {
+					showSelectedLoanJButton.setEnabled(false);
+				}
+			}
+		});
+		loanTableModel.addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent arg0) {
+				refreshLoanLabelCount();				
+			}			
+		});
+		loanJTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2)  {
+					if(loanJTable.getSelectedRow() != -1)  {
+						 if (e.getClickCount() == 2) {
+							 new LoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
+						 }
+				     }
+				}
+			}
+		});
 		
 
+		
+		loanJTable.getColumnModel().getColumn(0).setMaxWidth(50);
+		loanJTable.getColumnModel().getColumn(1).setMaxWidth(80);
+		loanJTable.getColumnModel().getColumn(2).setMinWidth(500);
+		
+		DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+		leftRenderer.setHorizontalAlignment( JLabel.CENTER );
+		loanJTable.getColumnModel().getColumn(1).setCellRenderer( leftRenderer );
+			
+		loanSorter = new TableRowSorter<LoanTableModel>(loanTableModel);
+		loanJTable.setRowSorter(loanSorter);
+		
+		overdueFilter = new RowFilter<Object, Object>() {
+	        public boolean include(Entry entry) {
+	        	if (showOverdue){
+	        		return true;
+	        	}
+	        	return (((String) entry.getValue(0)).matches("fällig"));
+	        }
+	    };	    
+	    loanSorter.setRowFilter(overdueFilter);
+	
 	}
 	
-	private void refreshLabelCount() {
+	private void refreshBookLabelCount() {
 		bookCountJLabel.setText("Anzahl Bücher: " + library.getBooks().size());
 		copiesCountJLabel.setText("Anzahl Exemplare: " + library.getCopies().size());
 	}
 	
-	public void applyFilter() {
+	private void refreshLoanLabelCount() {
+		countLoanJLabel.setText("Anzahl Ausleihen: " + library.getLoans().size());
+		currentLoanJLabel.setText("Anzahl Ausgeliehen: " + library.getLentOutBooks().size());
+		overdueLoanJLabel = new JLabel("Überfällige Ausleihen: " + library.getOverdueLoans().size());
+	}
+	
+	public void applyBookFilter() {
 		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>();
-		filters.add(filter);
-		filters.add(RowFilter.regexFilter("(?i)" + searchJTextField.getText()));
-		sorter.setRowFilter(RowFilter.andFilter(filters));
+		filters.add(availableFilter);
+		filters.add(RowFilter.regexFilter("(?i)" + searchBookJTextField.getText()));
+		bookSorter.setRowFilter(RowFilter.andFilter(filters));
+	}
+	
+	public void applyLoanFilter() {
+		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>();
+		filters.add(overdueFilter);
+		filters.add(RowFilter.regexFilter("(?i)" + searchLoanJTextField.getText()));
+		loanSorter.setRowFilter(RowFilter.andFilter(filters));
 	}
 }

@@ -16,23 +16,23 @@ import domain.Library;
 import domain.Book;
 import domain.Loan;
 
-public class CopyTableModel extends AbstractTableModel implements Observer {
+public class LoanTableModel extends AbstractTableModel implements Observer {
 
+	private String[] columns = { "" , "" , "" , "" , "" };
 	private Library library;
-	private Book currentBook;
-	private String[] columns = { "" , "" , "" };
-
-	public CopyTableModel(Library library, Book currentBook) {
-		library.addObserver(this);
+	
+	public LoanTableModel(Library library) {
 		this.library = library;
-		this.currentBook = currentBook;
+		library.addObserver(this);
 		setColumnHeaders();
 	}
 	
 	public void setColumnHeaders(){
-		columns[0] = "Id-Nr.";
-		columns[1] = "Zustand";
-		columns[2] = "Status";
+		columns[0] = "Status";
+		columns[1] = "Exemplar-ID";
+		columns[2] = "Titel";
+		columns[3] = "Ausgeliehen Bis";
+		columns[4] = "Ausgeliehen An";
 		fireTableStructureChanged();
 	}
 	
@@ -43,7 +43,7 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public String getColumnName(int column) {
 		return columns[column];
-	}		
+	}	
 	
 	@Override
 	public int getColumnCount() {
@@ -52,37 +52,43 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		return library.getCopiesOfBook(currentBook).size();
-	}
-	
-	@Override
-	public Class getColumnClass (int columnIndex) {
-		if (columnIndex == 0) { return Integer.class; }
-		if (columnIndex <= 2 && columnIndex >= 1) { return String.class; }
-		return Object.class;
+		return library.getLentOutLoans().size();
 	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		Loan loan = library.getLentOutLoans().get(rowIndex);
 		switch (columnIndex) {
 		case 0:
-			return library.getCopiesOfBook(currentBook).get(rowIndex).getInventoryNumber();
+			if (!loan.isOverdue()) { return "ok"; }
+			else { return "fällig"; }
 		case 1:
-			return library.getCopiesOfBook(currentBook).get(rowIndex).getCondition();
+			return loan.getCopy().getInventoryNumber();
 		case 2:
-			return getLoanInformation(library.getCopiesOfBook(currentBook).get(rowIndex));
+			return loan.getCopy().getTitle().getName();
+		case 3:
+			return getLoanInformation(loan);
+		case 4:
+			return loan.getCustomer().getSurname() + " " +  loan.getCustomer().getName();
 		default:
 			return null;
 		}
 	}
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		fireTableDataChanged();
+	}
 	
-	private String getLoanInformation(Copy currentCopy) {
-		Loan loan = library.getLoan(currentCopy);
-		if(!library.isCopyLent(currentCopy) || loan == null) { return " verfuegbar"; }
-		else {
-			if (!loan.isOverdue()) { return "Ausgeliehen bis " + getDateString(loan.getLatestReturnDate()) + getDaysInformationString(loan); }
-			else { return "Überzogen seit " + getDateString(loan.getLatestReturnDate()) + getDaysInformationString(loan); }
-		}
+	@Override
+	public Class getColumnClass (int columnIndex) {
+		if (columnIndex == 1) { return Integer.class; }
+		if (columnIndex <= 4 && columnIndex >= 0) { return String.class; }
+	return Object.class;
+	}
+	
+	private String getLoanInformation(Loan loan) {
+			return getDateString(loan.getLatestReturnDate()) + getDaysInformationString(loan);
 	}
 	
 	private String getDateString(GregorianCalendar date) {
@@ -110,11 +116,4 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 		}
 	}
 
-	@Override
-	public void update(Observable arg0, Object arg1) {
-		fireTableDataChanged();
-		
-	}
-
-	
 }
