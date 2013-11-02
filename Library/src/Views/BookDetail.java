@@ -70,7 +70,7 @@ public class BookDetail extends JFrame {
 	private CopyTableModel copyModel;
 	private JButton saveJButton;
 	private JButton addCopyJButton;
-	private ImageIcon erImage = new ImageIcon("src/erroricon.png");
+	private ImageIcon warningImage = new ImageIcon("images/warning.png");
 	private JLabel errorJLabel;
 	private JScrollPane scrollPane;
 	private JLabel quantityLabel;
@@ -114,7 +114,7 @@ public class BookDetail extends JFrame {
 		bookInformationJPanel.setLayout(gbl_bookInformationJPanel);
 		
 		errorJLabel = new JLabel("Bitte füllen Sie alle Felder aus.");
-		errorJLabel.setIcon(erImage);
+		errorJLabel.setIcon(warningImage);
 		errorJLabel.setVisible(false);
 		GridBagConstraints gbc_erorrJLabel = new GridBagConstraints();
 		gbc_erorrJLabel.anchor = GridBagConstraints.EAST;
@@ -222,15 +222,15 @@ public class BookDetail extends JFrame {
 		gbc_btnSpeichern.gridy = 4;
 		bookInformationJPanel.add(saveJButton, gbc_btnSpeichern);
 		
-		JPanel exampleJPanel = new JPanel();
-		exampleJPanel.setBorder(new TitledBorder(null, "Exemplare", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		contentPane.add(exampleJPanel);
+		JPanel copyJPanel = new JPanel();
+		copyJPanel.setBorder(new TitledBorder(null, "Exemplare", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPane.add(copyJPanel);
 		GridBagLayout gbl_ExamplePanel = new GridBagLayout();
 		gbl_ExamplePanel.columnWidths = new int[]{0, 0, 0, 0};
 		gbl_ExamplePanel.rowHeights = new int[]{0, 0, 0};
 		gbl_ExamplePanel.columnWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_ExamplePanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		exampleJPanel.setLayout(gbl_ExamplePanel);
+		copyJPanel.setLayout(gbl_ExamplePanel);
 		
 		quantityLabel = new JLabel("Anzahl: " + library.getCopiesOfBook(currentBook).size());
 		GridBagConstraints gbc_quantityLabel = new GridBagConstraints();
@@ -238,7 +238,7 @@ public class BookDetail extends JFrame {
 		gbc_quantityLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_quantityLabel.gridx = 0;
 		gbc_quantityLabel.gridy = 0;
-		exampleJPanel.add(quantityLabel, gbc_quantityLabel);
+		copyJPanel.add(quantityLabel, gbc_quantityLabel);
 		
 		removeSelectedJButton = new JButton("Ausgewählte Entfernen");
 		removeSelectedJButton.setEnabled(false);
@@ -254,7 +254,7 @@ public class BookDetail extends JFrame {
 		gbc_removeselectedButton.insets = new Insets(0, 0, 5, 5);
 		gbc_removeselectedButton.gridx = 1;
 		gbc_removeselectedButton.gridy = 0;
-		exampleJPanel.add(removeSelectedJButton, gbc_removeselectedButton);
+		copyJPanel.add(removeSelectedJButton, gbc_removeselectedButton);
 		
 		addCopyJButton = new JButton("Exemplar hinzufügen");
 		addCopyJButton.addActionListener(new ActionListener() {
@@ -278,7 +278,7 @@ public class BookDetail extends JFrame {
 		gbc_addCopyButton.insets = new Insets(0, 0, 5, 0);
 		gbc_addCopyButton.gridx = 2;
 		gbc_addCopyButton.gridy = 0;
-		exampleJPanel.add(addCopyJButton, gbc_addCopyButton);
+		copyJPanel.add(addCopyJButton, gbc_addCopyButton);
 		
 		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -287,7 +287,7 @@ public class BookDetail extends JFrame {
 		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 1;
-		exampleJPanel.add(scrollPane, gbc_scrollPane);
+		copyJPanel.add(scrollPane, gbc_scrollPane);
 		
 		
 		copyModel = new CopyTableModel(library, currentBook);
@@ -344,7 +344,7 @@ public class BookDetail extends JFrame {
 	private void deleteCopy() {
 		if (library.bookExists(currentBook)) {
 			int[] selected = copyTable.getSelectedRows();
-			ArrayList<Copy> selectedCopies = new ArrayList<>();
+			ArrayList<Copy> selectedCopies = new ArrayList<Copy>();
 			for(int s : selected) {
 				selectedCopies.add(library.getCopiesOfBook(currentBook).get(s));
 			}

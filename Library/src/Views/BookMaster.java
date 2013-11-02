@@ -359,7 +359,7 @@ public class BookMaster extends JFrame{
 		showSelectedLoanJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(int i : loanJTable.getSelectedRows()) {
-					new LoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(i)));
+					new LoanDetail(library, library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(i)));
 				}
 			}
 		});
@@ -378,7 +378,7 @@ public class BookMaster extends JFrame{
 		collectedloanJPanel.add(newLoanJButton, gbc_newLoanJButton);
 		newLoanJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new LoanDetail(null);
+				new LoanDetail(library, null);
 			}
 		});
 		
@@ -419,7 +419,7 @@ public class BookMaster extends JFrame{
 				if(e.getClickCount() == 2)  {
 					if(loanJTable.getSelectedRow() != -1)  {
 						 if (e.getClickCount() == 2) {
-							 new LoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
+							 new LoanDetail(library, library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
 						 }
 				     }
 				}

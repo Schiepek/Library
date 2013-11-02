@@ -1,6 +1,6 @@
 package domain;
 
-public class Customer {
+public class Customer implements Comparable<Customer> {
 	
 	private String name, surname, street, city;
 	private int zip;
@@ -31,6 +31,13 @@ public class Customer {
 	public void setSurname(String surname) {
 		this.surname = surname;
 	}
+	
+	public String getFullName() {
+		if (this == null) {
+			return "";
+		}
+		return name + " " + surname;
+	}
 
 	public String getStreet() {
 		return street;
@@ -60,5 +67,10 @@ public class Customer {
 	public String toString() {
 		return name + " " + surname + " , " + street + " , " + zip + " " + city;
 	}
+	
+	@Override
+    public int compareTo(Customer customer) {
+        return this.getFullName().compareTo(customer.getFullName());
+    }
 
 }

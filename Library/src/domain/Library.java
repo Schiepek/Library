@@ -1,6 +1,7 @@
 package domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -121,6 +122,16 @@ public class Library extends Observable implements Observer{
 		return lentCopies;
 	}
 	
+	public List<Loan> getActiveCustomerLoans(Customer customer) {
+		List<Loan> lentCopies = new ArrayList<Loan>();
+		for (Loan l : loans) {
+			if (l.getCustomer().equals(customer) && l.isLent()) {
+				lentCopies.add(l);
+			}
+		}
+		return lentCopies;
+	}
+	
 	public List<Loan> getOverdueLoans() {
 		List<Loan> overdueLoans = new ArrayList<Loan>();
 		for ( Loan l : getLoans() ) {
@@ -204,6 +215,7 @@ public class Library extends Observable implements Observer{
 	}
 
 	public List<Customer> getCustomers() {
+		Collections.sort(customers);
 		return customers;
 	}
 	
@@ -224,6 +236,15 @@ public class Library extends Observable implements Observer{
 			if (tempBook.equals(book)) { return true; }
 		}
 		return false;
+	}
+	
+	public Copy getCopyByID(int inventoryNumber)  {
+		for(Copy c : copies)  {
+			if(c.getInventoryNumber() == inventoryNumber)  {
+				return c;
+			}	
+		}
+		return null;
 	}
 	
 	private void doNotify() {
