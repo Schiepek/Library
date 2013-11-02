@@ -17,6 +17,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import domain.Book;
 import domain.Copy;
 import domain.Customer;
 import domain.Library;
@@ -44,6 +45,8 @@ import javax.swing.JTable;
 import viewModels.CopyTableModel;
 import viewModels.CustomerComboBoxModel;
 import viewModels.LoanDetailTableModel;
+import viewModels.LoanTableModel;
+
 import javax.swing.DefaultComboBoxModel;
 
 public class LoanDetail extends JFrame {
@@ -72,6 +75,7 @@ public class LoanDetail extends JFrame {
 		if (currentLoan == null) { currentLoan = initEmptyLoan(null); }
 		this.currentLoan = currentLoan;
 		this.library = library;
+		this.customer = currentLoan.getCustomer();
 		initGUI();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -185,9 +189,39 @@ public class LoanDetail extends JFrame {
 		loanJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Copy copy = library.getCopyByID(Integer.parseInt(copyIDJTextField.getText()));
-				library.createAndAddLoan(library.getCustomers().get(customerJComboBox.getSelectedIndex()), copy);
+				customer = library.getCustomers().get(customerJComboBox.getSelectedIndex());
+				Loan addedLoan = library.createAndAddLoan(customer, copy);
+				currentLoan = addedLoan;
+				loanModel = new LoanDetailTableModel(library, currentLoan);
+				//loanModel = new LoanTableModel(library);
+				loanTable.setModel(loanModel);
 				copyIDJTextField.setText("");
+				updateGUI(customer);
+				//copyModel = new CopyTableModel(library, currentBook);
+				//copyTable.setModel(copyModel);
+				
+				
+				
+				//Copy copy = library.getCopyByID(Integer.parseInt(copyIDJTextField.getText()));
+				//library.createAndAddLoan(library.getCustomers().get(customerJComboBox.getSelectedIndex()), copy);
+				//copyIDJTextField.setText("");
 				//updateGUI(library.getCustomers().get(customerJComboBox.getSelectedIndex()));
+				//createNewLoan();
+//				if (currentLoan.getCopy() == null) {
+//					createNewLoan();
+//				}
+//				if (currentBook.getName().isEmpty()) {
+//					try {
+//						createNewBook();
+//						saveJButton.setVisible(true);
+//						errorJLabel.setVisible(false);
+//					} catch (IllegalArgumentException ex) {
+//						errorJLabel.setText(ex.getMessage());
+//						errorJLabel.setVisible(true);
+//					}
+//				} else {
+//					createNewCopy();
+//				}
 			}
 		});
 		GridBagConstraints gbc_loanJButton = new GridBagConstraints();
@@ -288,10 +322,27 @@ public class LoanDetail extends JFrame {
 		
 	}
 	
+	private void createNewLoan() {
+		//Loan addedLoan = new Loan(customer, library.getCopyByID(Integer.parseInt(copyIDJTextField.getText())));
+		Copy copy = library.getCopyByID(Integer.parseInt(copyIDJTextField.getText()));
+		Loan addedLoan = library.createAndAddLoan(customer, copy);
+		currentLoan = addedLoan;
+		loanModel = new LoanDetailTableModel(library, currentLoan);
+		//loanModel = new LoanTableModel(library);
+		loanTable.setModel(loanModel);
+		//copyModel = new CopyTableModel(library, currentBook);
+		//copyTable.setModel(copyModel);
+
+	}
+	
 	
 	private void updateGUI(Customer c)  {
 		try  {
-			if (c == null) {
+			if (c == null && (customerJComboBox.getSelectedIndex() == -1)) {
+				statusValueJLabel.setText("Bitte einen Kunden auswählen.");
+				statusValueJLabel.setIcon(warningImage);
+				return;
+			} else if (c == null) {
 				c = library.getCustomers().get(customerJComboBox.getSelectedIndex());
 			}
 			loanModel = new LoanDetailTableModel(library, currentLoan);
