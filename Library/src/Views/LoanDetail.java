@@ -197,31 +197,7 @@ public class LoanDetail extends JFrame {
 				loanTable.setModel(loanModel);
 				copyIDJTextField.setText("");
 				updateGUI(customer);
-				//copyModel = new CopyTableModel(library, currentBook);
-				//copyTable.setModel(copyModel);
-				
-				
-				
-				//Copy copy = library.getCopyByID(Integer.parseInt(copyIDJTextField.getText()));
-				//library.createAndAddLoan(library.getCustomers().get(customerJComboBox.getSelectedIndex()), copy);
-				//copyIDJTextField.setText("");
-				//updateGUI(library.getCustomers().get(customerJComboBox.getSelectedIndex()));
-				//createNewLoan();
-//				if (currentLoan.getCopy() == null) {
-//					createNewLoan();
-//				}
-//				if (currentBook.getName().isEmpty()) {
-//					try {
-//						createNewBook();
-//						saveJButton.setVisible(true);
-//						errorJLabel.setVisible(false);
-//					} catch (IllegalArgumentException ex) {
-//						errorJLabel.setText(ex.getMessage());
-//						errorJLabel.setVisible(true);
-//					}
-//				} else {
-//					createNewCopy();
-//				}
+
 			}
 		});
 		GridBagConstraints gbc_loanJButton = new GridBagConstraints();
@@ -321,19 +297,7 @@ public class LoanDetail extends JFrame {
 		updateGUI(currentLoan.getCustomer());
 		
 	}
-	
-	private void createNewLoan() {
-		//Loan addedLoan = new Loan(customer, library.getCopyByID(Integer.parseInt(copyIDJTextField.getText())));
-		Copy copy = library.getCopyByID(Integer.parseInt(copyIDJTextField.getText()));
-		Loan addedLoan = library.createAndAddLoan(customer, copy);
-		currentLoan = addedLoan;
-		loanModel = new LoanDetailTableModel(library, currentLoan);
-		//loanModel = new LoanTableModel(library);
-		loanTable.setModel(loanModel);
-		//copyModel = new CopyTableModel(library, currentBook);
-		//copyTable.setModel(copyModel);
 
-	}
 	
 	
 	private void updateGUI(Customer c)  {
