@@ -21,9 +21,11 @@ import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
@@ -94,8 +96,39 @@ public class BookDetail extends JFrame {
 	
 	private void initGUI() {
 		this.setMinimumSize(new Dimension(600, 400));
-				
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.out.println(publisherJTextField.getText() + ", " + currentBook.getPublisher());
+				if (!titleJTextField.getText().equals(currentBook.getName()) ||
+						!authorJTextField.getText().equals(currentBook.getAuthor()) ||
+						!publisherJTextField.getText().equals(currentBook.getPublisher()) ||
+						!shelfJComboBox.getSelectedItem().equals(currentBook.getShelf())) {
+					
+					int confirmed = JOptionPane.showConfirmDialog(null, 
+					        "Möchten Sie die Änderungen speichern?", "Schliessen",
+					        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+				    if (confirmed == JOptionPane.YES_OPTION) {
+				    	try {
+							BookDetail.this.currentBook.setName(titleJTextField.getText());
+							BookDetail.this.currentBook.setAuthor(authorJTextField.getText());
+							BookDetail.this.currentBook.setPublisher(publisherJTextField.getText());
+							BookDetail.this.currentBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
+							errorJLabel.setVisible(false);
+						} catch (IllegalArgumentException ex) {
+							errorJLabel.setText(ex.getMessage());
+							errorJLabel.setVisible(true);
+							return;
+						}
+				    }
+				}
+				dispose();
+			}
+		});
+		
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -360,5 +393,8 @@ public class BookDetail extends JFrame {
 	private void refreshLabelCount() {
 		quantityLabel.setText("Anzahl: " + library.getCopiesOfBook(currentBook).size());
 	}
+	
+	
+	
 
 }

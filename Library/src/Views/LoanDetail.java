@@ -34,7 +34,10 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -356,7 +359,11 @@ public class LoanDetail extends JFrame {
 							statusValueJLabel.setText("Der Kunde hat eine überfällige Ausleihe.");
 						}
 						else if(library.isCopyLent(copy))  {
-							statusValueJLabel.setText("Dieses Exemplar ist bereits ausgeliehen.");
+							if (library.getLoan(copy).isOverdue()) {
+								statusValueJLabel.setText("Dieses Exemplar ist überfällig seit " + getDateString(library.getLoan(copy).getLatestReturnDate()));
+							} else {
+								statusValueJLabel.setText("Dieses Exemplar ist ausgeliehen bis " + getDateString(library.getLoan(copy).getLatestReturnDate()));
+							}
 						}
 						else  {
 								statusValueJLabel.setText("Verfügbar");
@@ -374,6 +381,14 @@ public class LoanDetail extends JFrame {
 		}
 		loanJButton.setEnabled(false);
 		statusValueJLabel.setIcon(warningImage);
+	}
+	
+	private String getDateString(GregorianCalendar date) {
+		if (date != null) {
+			DateFormat f = SimpleDateFormat.getDateInstance();
+			return f.format(date.getTime());
+		}
+		return "00.00.00";
 	}
 
 }
