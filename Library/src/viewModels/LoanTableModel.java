@@ -77,7 +77,17 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		fireTableDataChanged();
+		int loanPos = library.getRemovedLoanIndex();
+		if (loanPos>=0){
+			fireTableRowsDeleted(loanPos, loanPos);
+		}else{
+			loanPos = library.getAddedLoanIndex();
+			if (loanPos>=0){
+				fireTableRowsInserted(loanPos, loanPos);
+			}else{
+				fireTableDataChanged();
+			}
+		}
 	}
 	
 	@Override

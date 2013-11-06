@@ -3,8 +3,9 @@ package domain;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Observable;
 
-public class Loan {
+public class Loan extends Observable {
 
 	private Copy copy;
 	private Customer customer;
@@ -24,6 +25,7 @@ public class Loan {
 	public boolean returnCopy() {
 		try {
 			returnCopy(new GregorianCalendar());
+			doNotify();
 		} catch (IllegalLoanOperationException e) {
 			return false;
 		}
@@ -126,5 +128,10 @@ public class Loan {
 		dueDate.add(GregorianCalendar.SECOND, 59);
 		
 		return ( new GregorianCalendar().after(dueDate) );
+	}
+	
+	private void doNotify() {
+		setChanged();
+		notifyObservers();
 	}
 }

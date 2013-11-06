@@ -28,7 +28,6 @@ public class LibraryApp {
 	public static void main(String[] args) throws Exception {
 		Library library = new Library();
 		initLibrary(library);
-		//initBookMaster(library);
 		new BookMaster(library);
 	}
 

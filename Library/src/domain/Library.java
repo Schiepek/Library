@@ -16,6 +16,9 @@ public class Library extends Observable implements Observer{
 	private int editedBookIndex;
 	private int addBookIndex;
 	private int removeBookIndex;
+	private int addLoanIndex;
+	private int removeLoanIndex;
+
 
 	public Library() {
 		copies = new ArrayList<Copy>();
@@ -27,7 +30,13 @@ public class Library extends Observable implements Observer{
 	public Loan createAndAddLoan(Customer customer, Copy copy) {
 		if (!isCopyLent(copy)) {
 			Loan l = new Loan(customer, copy);
-			loans.add(l);
+			l.addObserver(this);
+			loans.add(l);			
+			addLoanIndex=getLentOutLoans().indexOf(l);
+			removeLoanIndex=-1;
+			addBookIndex=-1;
+			editedBookIndex=-1;
+			removeBookIndex=-1;
 			doNotify();
 			return l;
 		} else {
@@ -50,6 +59,8 @@ public class Library extends Observable implements Observer{
 		addBookIndex=books.indexOf(b);
 		editedBookIndex=-1;
 		removeBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
 		
 		doNotify();
 		return b;
@@ -62,6 +73,8 @@ public class Library extends Observable implements Observer{
 		addBookIndex=books.indexOf(book);
 		editedBookIndex=-1;
 		removeBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
 		
 		doNotify();
 	}
@@ -69,6 +82,11 @@ public class Library extends Observable implements Observer{
 	public Copy createAndAddCopy(Book title) {
 		Copy c = new Copy(title);
 		copies.add(c);
+		addBookIndex=-1;
+		editedBookIndex=-1;
+		removeBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
 		doNotify();
 		return c;
 	}
@@ -181,6 +199,11 @@ public class Library extends Observable implements Observer{
 		if (getCopiesOfBook(copy.getTitle()).isEmpty()) {
 			removeBook(copy.getTitle());
 		}
+		addBookIndex=-1;
+		editedBookIndex=-1;
+		removeBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
 		doNotify();
 	}
 	
@@ -188,16 +211,22 @@ public class Library extends Observable implements Observer{
 		for(Copy copy : copies) {
 			removeCopy(copy);
 		}
+		addBookIndex=-1;
+		editedBookIndex=-1;
+		removeBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
 		doNotify();
 	}
 	
 	public void removeBook(Book book) {
-		book.deleteObserver(this);
-		books.remove(book);
-		
+		book.deleteObserver(this);	
 		removeBookIndex=books.indexOf(book);
 		editedBookIndex=-1;
 		addBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
+		books.remove(book);
 		
 		doNotify();
 	}
@@ -231,6 +260,14 @@ public class Library extends Observable implements Observer{
 		return removeBookIndex;
 	}
 	
+	public int getAddedLoanIndex() {
+		return addLoanIndex;
+	}
+	
+	public int getRemovedLoanIndex() {
+		return removeLoanIndex;
+	}
+	
 	public boolean bookExists(Book book) {
 		for(Book tempBook : getBooks()) {
 			if (tempBook.equals(book)) { return true; }
@@ -253,14 +290,25 @@ public class Library extends Observable implements Observer{
 	}
 
 	@Override
-	public void update(Observable book, Object arg1) {
-		editedBookIndex=books.indexOf(book);	
-		addBookIndex=-1;
-		removeBookIndex=-1;
-
-		setChanged();
-		notifyObservers(book);
-		
+	public void update(Observable obs, Object arg1) {
+		if(obs instanceof Book) {
+			editedBookIndex=books.indexOf(obs);
+			addBookIndex=-1;
+			removeBookIndex=-1;
+			removeLoanIndex=-1;
+			addLoanIndex=-1;
+			setChanged();
+			notifyObservers(obs);
+		}
+		if(obs instanceof Loan) {
+			editedBookIndex=books.indexOf(((Loan)obs).getCopy().getTitle());
+			addBookIndex=-1;
+			removeBookIndex=-1;
+			removeLoanIndex=-1;
+			addLoanIndex=-1;
+			setChanged();
+			notifyObservers(obs);
+		}
 	}
 
 }

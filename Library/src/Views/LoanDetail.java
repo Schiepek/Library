@@ -65,11 +65,13 @@ public class LoanDetail extends JFrame {
 	private JLabel statusValueJLabel;
 	private JLabel authorValueJLabel;
 	private JComboBox customerJComboBox;
+	private CustomerComboBoxModel customerBoxModel;
 	private JButton loanJButton;
 	private JPanel loanJPanel;
 	private JLabel numberOfLoanJLabel;
 	private ImageIcon warningImage = new ImageIcon("images/warning.png");
 	private ImageIcon applyImage = new ImageIcon("images/apply.png");
+	private JButton returnJButton;
 
 
 	public LoanDetail(Library library, Loan currentLoan) {
@@ -116,8 +118,9 @@ public class LoanDetail extends JFrame {
 		gbc_customerJLabel.gridy = 0;
 		customerJPanel.add(customerJLabel, gbc_customerJLabel);
 		
-		customerJComboBox = new JComboBox();
-		customerJComboBox.setModel(new CustomerComboBoxModel(library));
+		
+		customerBoxModel = new CustomerComboBoxModel(library);
+		customerJComboBox = new JComboBox(customerBoxModel);
 		if (customer == null) {
 			customerJComboBox.setSelectedItem("");
 		} else {
@@ -269,9 +272,9 @@ public class LoanDetail extends JFrame {
 		
 		contentPane.add(loanJPanel);
 		GridBagLayout gbl_loanJPanel = new GridBagLayout();
-		gbl_loanJPanel.columnWidths = new int[]{0, 0};
+		gbl_loanJPanel.columnWidths = new int[]{0, 0, 0};
 		gbl_loanJPanel.rowHeights = new int[]{0, 0, 0};
-		gbl_loanJPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_loanJPanel.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
 		gbl_loanJPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		loanJPanel.setLayout(gbl_loanJPanel);
 
@@ -279,14 +282,31 @@ public class LoanDetail extends JFrame {
 		numberOfLoanJLabel = new JLabel("Anzahl Ausleihen: "  + library.getActiveCustomerLoans(currentLoan.getCustomer()).size());
 		GridBagConstraints gbc_numberOfLoanJLabel = new GridBagConstraints();
 		gbc_numberOfLoanJLabel.anchor = GridBagConstraints.WEST;
-		gbc_numberOfLoanJLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_numberOfLoanJLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_numberOfLoanJLabel.gridx = 0;
 		gbc_numberOfLoanJLabel.gridy = 0;
 		loanJPanel.add(numberOfLoanJLabel, gbc_numberOfLoanJLabel);
 		
+		returnJButton = new JButton("Zurückgeben");
+		returnJButton.setEnabled(false);
+		returnJButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for(int rowIndex : loanTable.getSelectedRows()) {
+					Loan returnLoan = library.getActiveCustomerLoans(currentLoan.getCustomer()).get(loanTable.convertRowIndexToModel(rowIndex));
+					returnLoan.returnCopy();
+				}
+			}
+		});
+		GridBagConstraints gbc_returnJButton = new GridBagConstraints();
+		gbc_returnJButton.insets = new Insets(0, 0, 5, 0);
+		gbc_returnJButton.gridx = 1;
+		gbc_returnJButton.gridy = 0;
+		loanJPanel.add(returnJButton, gbc_returnJButton);
+		
 		JScrollPane scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
+		gbc_scrollPane.gridwidth = 2;
+		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 1;
@@ -296,6 +316,16 @@ public class LoanDetail extends JFrame {
 		loanTable = new JTable();
 		scrollPane.setViewportView(loanTable);
 		loanTable.setModel(loanModel);
+		loanTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (loanTable.getSelectedRowCount() > 0) {
+					returnJButton.setEnabled(true);
+				} else {
+					returnJButton.setEnabled(false);
+				}
+			}
+		});
 		
 		updateGUI(currentLoan.getCustomer());
 		

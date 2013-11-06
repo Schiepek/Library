@@ -150,20 +150,16 @@ public class BookMaster extends JFrame{
 		
 		searchBookJTextField = new JTextField();
 		searchBookJTextField.getDocument().addDocumentListener(new DocumentListener() {
-
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				applyBookFilter();
 			}
-
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				applyBookFilter();
 			}
-
 			@Override
-			public void changedUpdate(DocumentEvent e) {}
-			
+			public void changedUpdate(DocumentEvent e) {}			
 		});
 		GridBagConstraints gbc_searchJTextField = new GridBagConstraints();
 		gbc_searchJTextField.insets = new Insets(0, 0, 5, 5);
@@ -219,7 +215,7 @@ public class BookMaster extends JFrame{
 				if(e.getClickCount() == 2)  {
 					if(bookJTable.getSelectedRow() != -1)  {
 						 if (e.getClickCount() == 2) {
-							 new BookDetail(library, library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));
+							 new BookDetail(library, library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));							 
 						 }
 				     }
 				}

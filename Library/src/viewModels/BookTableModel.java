@@ -84,7 +84,6 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 				bookPos = library.getInsertedBookIndex();
 				if (bookPos>=0){
 					fireTableDataChanged();
-					//fireTableRowsInserted(bookPos, bookPos); //hier ist noch ein Bug
 				}else{
 					fireTableDataChanged();
 				}
