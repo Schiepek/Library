@@ -100,7 +100,6 @@ public class BookDetail extends JFrame {
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				System.out.println(publisherJTextField.getText() + ", " + currentBook.getPublisher());
 				if (!titleJTextField.getText().equals(currentBook.getName()) ||
 						!authorJTextField.getText().equals(currentBook.getAuthor()) ||
 						!publisherJTextField.getText().equals(currentBook.getPublisher()) ||
@@ -376,18 +375,29 @@ public class BookDetail extends JFrame {
 	
 	private void deleteCopy() {
 		if (library.bookExists(currentBook)) {
+			boolean hasLentOutLoans = false;
 			int[] selected = copyTable.getSelectedRows();
 			ArrayList<Copy> selectedCopies = new ArrayList<Copy>();
 			for(int s : selected) {
 				selectedCopies.add(library.getCopiesOfBook(currentBook).get(s));
+				if(library.isCopyLent(library.getCopiesOfBook(currentBook).get(s))) hasLentOutLoans=true;
 			}
-			library.removeCopies(selectedCopies);
-			if(!library.bookExists(currentBook)) {
-				this.dispose();
+			if(hasLentOutLoans && verifyDeleteCopy() || !hasLentOutLoans) {
+				library.removeCopies(selectedCopies);
+				if(!library.bookExists(currentBook)) {
+					this.dispose();
+				}
+				copyTable.clearSelection();
+				refreshLabelCount();
 			}
-			copyTable.clearSelection();
-			refreshLabelCount();
 		}
+	}
+	
+	private boolean verifyDeleteCopy() {
+		int result = JOptionPane.showConfirmDialog(null, "Ihre Auswahl enthält ausgeliehene Kopien, Wollen Sie trotzdem entfernen?", "TITEL", JOptionPane.YES_NO_OPTION);
+		if (result == JOptionPane.YES_OPTION) {
+			return true;
+		} else { return false; }
 	}
 	
 	private void refreshLabelCount() {

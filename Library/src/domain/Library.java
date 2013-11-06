@@ -194,8 +194,23 @@ public class Library extends Observable implements Observer{
 		return null;
 	}
 	
+	private void removeLoan(Copy copy) {
+		Loan removedLoan;
+		addBookIndex=-1;
+		editedBookIndex=-1;
+		removeBookIndex=-1;
+		removeLoanIndex=-1;
+		addLoanIndex=-1;
+		if(isCopyLent(copy)) {
+			removeLoanIndex=getLentOutLoans().indexOf(getLoan(copy));
+			loans.remove(getLoan(copy));
+		}
+		doNotify();
+	}
+	
 	public void removeCopy(Copy copy) {
 		copies.remove(copy);
+		removeLoan(copy);
 		if (getCopiesOfBook(copy.getTitle()).isEmpty()) {
 			removeBook(copy.getTitle());
 		}
@@ -259,7 +274,6 @@ public class Library extends Observable implements Observer{
 	public int getRemovedBookIndex() {
 		return removeBookIndex;
 	}
-	
 	public int getAddedLoanIndex() {
 		return addLoanIndex;
 	}

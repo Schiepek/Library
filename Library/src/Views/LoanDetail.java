@@ -291,10 +291,7 @@ public class LoanDetail extends JFrame {
 		returnJButton.setEnabled(false);
 		returnJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				for(int rowIndex : loanTable.getSelectedRows()) {
-					Loan returnLoan = library.getActiveCustomerLoans(currentLoan.getCustomer()).get(loanTable.convertRowIndexToModel(rowIndex));
-					returnLoan.returnCopy();
-				}
+				returnLoan();
 			}
 		});
 		GridBagConstraints gbc_returnJButton = new GridBagConstraints();
@@ -419,6 +416,14 @@ public class LoanDetail extends JFrame {
 			return f.format(date.getTime());
 		}
 		return "00.00.00";
+	}
+	
+	private void returnLoan(){
+		int[] selected = loanTable.getSelectedRows();
+		ArrayList<Loan> selectedLoans = new ArrayList<Loan>();
+		for(int s : selected) selectedLoans.add(library.getActiveCustomerLoans(currentLoan.getCustomer()).get(s));
+		for(Loan returnLoan : selectedLoans) returnLoan.returnCopy();
+		loanTable.clearSelection();
 	}
 
 }
