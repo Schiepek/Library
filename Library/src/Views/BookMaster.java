@@ -455,7 +455,7 @@ public class BookMaster extends JFrame{
 	private void refreshLoanLabelCount() {
 		countLoanJLabel.setText("Anzahl Ausleihen: " + library.getLoans().size());
 		currentLoanJLabel.setText("Anzahl Ausgeliehen: " + library.getLentOutBooks().size());
-		overdueLoanJLabel = new JLabel("Überfällige Ausleihen: " + library.getOverdueLoans().size());
+		overdueLoanJLabel.setText("Überfällige Ausleihen: " + library.getOverdueLoans().size());
 	}
 	
 	public void applyBookFilter() {
