@@ -394,7 +394,7 @@ public class BookDetail extends JFrame {
 	}
 	
 	private boolean verifyDeleteCopy() {
-		int result = JOptionPane.showConfirmDialog(null, "Ihre Auswahl enthält ausgeliehene Kopien, Wollen Sie trotzdem entfernen?", "TITEL", JOptionPane.YES_NO_OPTION);
+		int result = JOptionPane.showConfirmDialog(null, "Ihre Auswahl enthält ausgeliehene Kopien, Wollen Sie trotzdem entfernen?", "Ausleihen löschen", JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
 			return true;
 		} else { return false; }
