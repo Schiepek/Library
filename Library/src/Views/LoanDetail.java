@@ -76,11 +76,11 @@ public class LoanDetail extends JFrame {
 
 	public LoanDetail(Library library, Loan currentLoan) {
 		super();
-		setTitle("Ausleihen");
 		if (currentLoan == null) { currentLoan = initEmptyLoan(null); }
 		this.currentLoan = currentLoan;
 		this.library = library;
 		this.customer = currentLoan.getCustomer();
+		setTitle(currentLoan.getCustomer().getFullName());
 		initGUI();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -136,7 +136,8 @@ public class LoanDetail extends JFrame {
 				} else {
 					currentLoan = initEmptyLoan(customer);
 				}
-				
+				//System.out.println(currentLoan.getCustomer().getFullName());
+				//setTitle(currentLoan.getCustomer().getFullName());
 				updateGUI(customer);
 			}
 		});
@@ -339,6 +340,7 @@ public class LoanDetail extends JFrame {
 			} else if (c == null) {
 				c = library.getCustomers().get(customerJComboBox.getSelectedIndex());
 			}
+			setTitle(c.getFullName());
 			loanModel = new LoanDetailTableModel(library, currentLoan);
 			loanTable.setModel(loanModel);
 			loanTable.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -358,7 +360,27 @@ public class LoanDetail extends JFrame {
 			loanJPanel.setBorder(new TitledBorder(null, "Ausleihen von " + c.getFullName(), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			
 			if(copyIDJTextField.getText().isEmpty())  {
-				statusValueJLabel.setText("Bitte geben Sie die gewünschte Exemplar-ID ein.");
+				List<Loan> customerLoans = library.getActiveCustomerLoans(c);
+				
+				if(customerLoans.size() >= 3)  {
+					statusValueJLabel.setText("Der Kunde hat bereits 3 Bücher ausgeliehen.");
+				}
+				else  {
+					boolean overdue = false;
+					for(Loan l : customerLoans)  {
+						if(l.isOverdue())  {
+							overdue = true;
+						}
+					}
+				
+					if(overdue)  {
+						statusValueJLabel.setText("Der Kunde hat eine überfällige Ausleihe.");
+					} else {
+						statusValueJLabel.setText("Bitte geben Sie die gewünschte Exemplar-ID ein.");
+					}
+				}
+				
+				
 			}
 			else  {
 				Copy copy = library.getCopyByID(Integer.parseInt(copyIDJTextField.getText()));

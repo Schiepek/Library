@@ -83,6 +83,7 @@ public class BookDetail extends JFrame {
 		if (currentBook == null) { currentBook = initEmptyBook(); }
 		this.currentBook = currentBook;
 		
+		setTitle(currentBook.getName());
 		initGUI();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -240,6 +241,7 @@ public class BookDetail extends JFrame {
 					BookDetail.this.currentBook.setPublisher(publisherJTextField.getText());
 					BookDetail.this.currentBook.setShelf((Shelf)shelfJComboBox.getSelectedItem());
 					errorJLabel.setVisible(false);
+					setTitle(currentBook.getName());
 				} catch (IllegalArgumentException ex) {
 					errorJLabel.setText(ex.getMessage());
 					errorJLabel.setVisible(true);
@@ -348,11 +350,7 @@ public class BookDetail extends JFrame {
 		
 	
 }
-	
 
-	
-	
-	
 	
 	private void createNewBook() {
 		Book addedBook = new Book(titleJTextField.getText());
