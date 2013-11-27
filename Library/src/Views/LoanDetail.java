@@ -25,14 +25,22 @@ import domain.Loan;
 import domain.Shelf;
 
 import javax.swing.BoxLayout;
+
 import java.awt.GridBagLayout;
+
 import javax.swing.JLabel;
+
 import java.awt.GridBagConstraints;
+
 import javax.swing.JTextField;
+
 import java.awt.Insets;
+
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -72,15 +80,17 @@ public class LoanDetail extends JFrame {
 	private ImageIcon warningImage = new ImageIcon("images/warning.png");
 	private ImageIcon applyImage = new ImageIcon("images/apply.png");
 	private JButton returnJButton;
+	private ArrayList<Customer> openedCustomers;
 
 
-	public LoanDetail(Library library, Loan currentLoan) {
+	public LoanDetail(Library library, Loan currentLoan, ArrayList<Customer> openedCustomers) {
 		super();
-		if (currentLoan == null) { currentLoan = initEmptyLoan(null); }
+		if (currentLoan == null) { currentLoan = initEmptyLoan(null); setTitle("Neue Ausleihe erfassen"); }
+		else { setTitle(currentLoan.getCustomer().getFullName()); }
 		this.currentLoan = currentLoan;
 		this.library = library;
 		this.customer = currentLoan.getCustomer();
-		setTitle(currentLoan.getCustomer().getFullName());
+		this.openedCustomers = openedCustomers;		
 		initGUI();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -93,7 +103,11 @@ public class LoanDetail extends JFrame {
 	
 	private void initGUI() {
 		this.setMinimumSize(new Dimension(600, 400));
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.addWindowListener(new java.awt.event.WindowAdapter(){
+			@Override
+			public void windowClosing(WindowEvent e) { disposeLoanDetail(); }
+		});
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -130,14 +144,14 @@ public class LoanDetail extends JFrame {
 		customerJComboBox.addActionListener(new ActionListener()  {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Customer customer = library.getCustomers().get(customerJComboBox.getSelectedIndex());
+				Customer oldCustomer = customer;
+				customer = library.getCustomers().get(customerJComboBox.getSelectedIndex());
 				if (library.getActiveCustomerLoans(customer).size() > 0) {
 					currentLoan = library.getActiveCustomerLoans(customer).get(0);
 				} else {
 					currentLoan = initEmptyLoan(customer);
 				}
-				//System.out.println(currentLoan.getCustomer().getFullName());
-				//setTitle(currentLoan.getCustomer().getFullName());
+				changeOpenedCustomers(oldCustomer,customer);
 				updateGUI(customer);
 			}
 		});
@@ -446,6 +460,16 @@ public class LoanDetail extends JFrame {
 		for(int s : selected) selectedLoans.add(library.getActiveCustomerLoans(currentLoan.getCustomer()).get(s));
 		for(Loan returnLoan : selectedLoans) returnLoan.returnCopy();
 		loanTable.clearSelection();
+	}
+	
+	private void disposeLoanDetail() {
+		openedCustomers.remove(customer);
+		this.dispose();
+	}
+	
+	private void changeOpenedCustomers(Customer oldCustomer, Customer newCustomer) {
+		if(oldCustomer==null) openedCustomers.remove(oldCustomer);
+		openedCustomers.add(newCustomer);
 	}
 
 }

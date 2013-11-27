@@ -76,12 +76,14 @@ public class BookDetail extends JFrame {
 	private JLabel errorJLabel;
 	private JScrollPane scrollPane;
 	private JLabel quantityLabel;
+	private ArrayList<Book> openedBooks;
 
-	public BookDetail(Library library , Book currentBook) {
+	public BookDetail(Library library , Book currentBook , ArrayList<Book> openedBooks) {
 		super();
 		this.library = library;
 		if (currentBook == null) { currentBook = initEmptyBook(); }
 		this.currentBook = currentBook;
+		this.openedBooks = openedBooks;
 		
 		setTitle(currentBook.getName());
 		initGUI();
@@ -124,7 +126,7 @@ public class BookDetail extends JFrame {
 						}
 				    }
 				}
-				dispose();
+				disposeBookDetail();
 			}
 		});
 		
@@ -363,6 +365,7 @@ public class BookDetail extends JFrame {
 		copyModel = new CopyTableModel(library, currentBook);
 		copyTable.setModel(copyModel);
 		createNewCopy();
+		openedBooks.add(currentBook);
 
 	}
 	
@@ -383,7 +386,7 @@ public class BookDetail extends JFrame {
 			if(hasLentOutLoans && verifyDeleteCopy() || !hasLentOutLoans) {
 				library.removeCopies(selectedCopies);
 				if(!library.bookExists(currentBook)) {
-					this.dispose();
+					disposeBookDetail();
 				}
 				copyTable.clearSelection();
 				refreshLabelCount();
@@ -400,6 +403,11 @@ public class BookDetail extends JFrame {
 	
 	private void refreshLabelCount() {
 		quantityLabel.setText("Anzahl: " + library.getCopiesOfBook(currentBook).size());
+	}
+	
+	private void disposeBookDetail() {
+		openedBooks.remove(currentBook);
+		this.dispose();
 	}
 	
 	

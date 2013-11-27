@@ -37,6 +37,8 @@ import javax.swing.JButton;
 
 import viewModels.BookTableModel;
 import viewModels.LoanTableModel;
+import domain.Book;
+import domain.Customer;
 import domain.Library;
 import domain.Loan;
 
@@ -82,6 +84,8 @@ public class BookMaster extends JFrame{
 	private JLabel countLoanJLabel;
 	private JLabel currentLoanJLabel;
 	private JLabel overdueLoanJLabel;	
+	private ArrayList<Book> openedBooks = new ArrayList<Book>();
+	private ArrayList<Customer> openedCustomers = new ArrayList<Customer>();
 
 	public BookMaster(Library library) {
 		super();
@@ -143,7 +147,7 @@ public class BookMaster extends JFrame{
 		showSelectedBookJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(int i : bookJTable.getSelectedRows()) {
-					new BookDetail(library, library.getBooks().get(bookJTable.convertRowIndexToModel(i)));
+					openBookDetail(library.getBooks().get(bookJTable.convertRowIndexToModel(i)));
 				}
 			}
 		});
@@ -190,7 +194,7 @@ public class BookMaster extends JFrame{
 		JButton newBookJButton = new JButton("Neues Buch hinzufügen");
 		newBookJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new BookDetail(library, null);
+				openBookDetail(null);
 			}
 		});
 		GridBagConstraints gbc_newBookJButton = new GridBagConstraints();
@@ -215,7 +219,7 @@ public class BookMaster extends JFrame{
 				if(e.getClickCount() == 2)  {
 					if(bookJTable.getSelectedRow() != -1)  {
 						 if (e.getClickCount() == 2) {
-							 new BookDetail(library, library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));							 
+							 openBookDetail(library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));							 
 						 }
 				     }
 				}
@@ -355,7 +359,7 @@ public class BookMaster extends JFrame{
 		showSelectedLoanJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for(int i : loanJTable.getSelectedRows()) {
-					new LoanDetail(library, library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(i)));
+					openLoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(i)));					
 				}
 			}
 		});
@@ -374,7 +378,7 @@ public class BookMaster extends JFrame{
 		collectedloanJPanel.add(newLoanJButton, gbc_newLoanJButton);
 		newLoanJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new LoanDetail(library, null);
+				openLoanDetail(null);
 			}
 		});
 		
@@ -415,7 +419,7 @@ public class BookMaster extends JFrame{
 				if(e.getClickCount() == 2)  {
 					if(loanJTable.getSelectedRow() != -1)  {
 						 if (e.getClickCount() == 2) {
-							 new LoanDetail(library, library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
+							 openLoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
 						 }
 				     }
 				}
@@ -470,5 +474,21 @@ public class BookMaster extends JFrame{
 		filters.add(overdueFilter);
 		filters.add(RowFilter.regexFilter("(?i)" + searchLoanJTextField.getText()));
 		loanSorter.setRowFilter(RowFilter.andFilter(filters));
+	}
+	
+	private void openBookDetail(Book openBook) {
+		if(!openedBooks.contains(openBook)) {
+			new BookDetail(library, openBook, openedBooks);
+			if(openBook != null) openedBooks.add(openBook);
+		}
+	}
+	
+	private void openLoanDetail(Loan loan) {
+		Customer openCustomer = null;
+		if(loan != null) openCustomer = loan.getCustomer();
+		if(!openedCustomers.contains(openCustomer)) {
+			new LoanDetail(library, loan, openedCustomers);
+			if(loan != null) openedCustomers.add(openCustomer);
+		}
 	}
 }
