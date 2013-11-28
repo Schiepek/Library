@@ -3,6 +3,7 @@ package Views;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Window;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -41,6 +42,7 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.DateFormat;
@@ -49,10 +51,13 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 
 import viewModels.CopyTableModel;
 import viewModels.CustomerComboBoxModel;
@@ -108,6 +113,34 @@ public class LoanDetail extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) { disposeLoanDetail(); }
 		});
+		// on ESC key close frame
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
+        	
+	        getRootPane().getActionMap().put("Cancel", new AbstractAction(){
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	Window w = LoanDetail.this;
+	            	w.getToolkit().getSystemEventQueue().postEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+	            }
+	        }
+        );
+	    // on Enter key save data in frame
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+        	
+	        getRootPane().getActionMap().put("Enter", new AbstractAction(){
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	if (loanJButton.isEnabled()) {
+	            		for(ActionListener a:  loanJButton.getActionListeners()) {
+		            	    a.actionPerformed(e);
+		            	}
+	            	}
+	            	
+	            }
+	        }
+        );
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();

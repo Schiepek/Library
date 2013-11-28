@@ -2,6 +2,7 @@ package Views;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Window;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -21,13 +22,18 @@ import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -101,7 +107,9 @@ public class BookDetail extends JFrame {
 	
 	private void initGUI() {
 		this.setMinimumSize(new Dimension(600, 400));
+
 		
+
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -131,6 +139,33 @@ public class BookDetail extends JFrame {
 				disposeBookDetail();
 			}
 		});
+		
+		// on ESC key close frame
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
+        	
+	        getRootPane().getActionMap().put("Cancel", new AbstractAction(){
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	Window w = BookDetail.this;
+	            	w.getToolkit().getSystemEventQueue().postEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+	            }
+	        }
+        );
+	    
+        // on Enter key save data in frame
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+        	
+	        getRootPane().getActionMap().put("Enter", new AbstractAction(){
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	for(ActionListener a: saveJButton.getActionListeners()) {
+	            	    a.actionPerformed(e);
+	            	}
+	            }
+	        }
+        );
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
