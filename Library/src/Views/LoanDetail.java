@@ -23,6 +23,7 @@ import domain.Customer;
 import domain.Library;
 import domain.Loan;
 import domain.Shelf;
+import domain.Copy.Condition;
 
 import javax.swing.BoxLayout;
 
@@ -420,6 +421,9 @@ public class LoanDetail extends JFrame {
 					
 						if(overdue)  {
 							statusValueJLabel.setText("Der Kunde hat eine überfällige Ausleihe.");
+						}
+						else if (copy.getCondition().equals(Condition.LOST)) {
+							statusValueJLabel.setText("Dieses Exemplar ist leider verloren gegangen.");
 						}
 						else if(library.isCopyLent(copy))  {
 							if (library.getLoan(copy).isOverdue()) {

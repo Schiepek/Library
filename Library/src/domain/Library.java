@@ -194,7 +194,7 @@ public class Library extends Observable implements Observer{
 		return null;
 	}
 	
-	private void removeLoan(Copy copy) {
+	public void removeLoan(Copy copy) {
 		Loan removedLoan;
 		addBookIndex=-1;
 		editedBookIndex=-1;

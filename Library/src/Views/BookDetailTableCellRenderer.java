@@ -1,22 +1,14 @@
 package Views;
 
 import java.awt.Component;
-
-import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import domain.Copy.Condition;
 
-
-//class BookDetailTableCellRenderer extends JComboBox implements TableCellRenderer {
-
-	
-//}
-
+@SuppressWarnings("serial")
 public class BookDetailTableCellRenderer extends JComboBox implements TableCellRenderer {
-	private static final long serialVersionUID = 1L;
 
 	public BookDetailTableCellRenderer() {
         super(Condition.values());
@@ -36,10 +28,3 @@ public class BookDetailTableCellRenderer extends JComboBox implements TableCellR
         return this;
     }
 }
-
-//@SuppressWarnings("serial")
-//public class BookDetailTableCellEditor extends DefaultCellEditor {
-//    public BookDetailTableCellEditor() {
-//        super(new JComboBox(Condition.values()));
-//    }
-//}

@@ -2,11 +2,13 @@ package viewModels;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import java.lang.String;
@@ -79,7 +81,8 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 	
 	private String getLoanInformation(Copy currentCopy) {
 		Loan loan = library.getLoan(currentCopy);
-		if(!library.isCopyLent(currentCopy) || loan == null) { return " verfuegbar"; }
+		if (currentCopy.getCondition().equals(Condition.LOST)) { return "verloren"; }
+		if(!library.isCopyLent(currentCopy) || loan == null) { return "verfuegbar"; }
 		else {
 			if (!loan.isOverdue()) { return "Ausgeliehen bis " + getDateString(loan.getLatestReturnDate()) + getDaysInformationString(loan); }
 			else { return "Überzogen seit " + getDateString(loan.getLatestReturnDate()) + getDaysInformationString(loan); }
@@ -126,8 +129,28 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 
 
     public void setValueAt(Object value, int rowIndex, int colIndex) {
-        library.getCopiesOfBook(currentBook).get(rowIndex).setCondition((Condition)value);
+    	Copy copy= library.getCopiesOfBook(currentBook).get(rowIndex);
+        
+        if (value.equals(Condition.LOST)) {
+        	if (library.isCopyLent(copy) && verifyDeleteCopy()) {
+        		copy.setCondition((Condition)value);
+        		library.removeLoan(copy);
+        	} else if (!library.isCopyLent(copy)) {
+        		copy.setCondition((Condition)value);
+        	}
+        	
+        } else {
+        	copy.setCondition((Condition)value);
+        }
     }
+    
+	private boolean verifyDeleteCopy() {
+		int result = JOptionPane.showConfirmDialog(null, "Dieses Exemplar ist zur Zeit ausgehliehen. Wollen Sie den Status trotzdem ändern?", "Exemplar verloren", JOptionPane.YES_NO_OPTION);
+		if (result == JOptionPane.YES_OPTION) {
+			return true;
+		}
+		return false;
+	}
 
 	
 }
