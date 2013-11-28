@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
@@ -435,6 +436,7 @@ public class BookMaster extends JFrame{
 		DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
 		leftRenderer.setHorizontalAlignment( JLabel.CENTER );
 		loanJTable.getColumnModel().getColumn(1).setCellRenderer( leftRenderer );
+		loanJTable.getColumnModel().getColumn(0).setCellRenderer(new LoanTableCellRenderer());
 			
 		loanSorter = new TableRowSorter<LoanTableModel>(loanTableModel);
 		loanJTable.setRowSorter(loanSorter);
@@ -465,14 +467,16 @@ public class BookMaster extends JFrame{
 	public void applyBookFilter() {
 		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>();
 		filters.add(availableFilter);
-		filters.add(RowFilter.regexFilter("(?i)" + searchBookJTextField.getText()));
+		String escaped = Pattern.quote(searchBookJTextField.getText());
+		filters.add(RowFilter.regexFilter("(?i)" + escaped));
 		bookSorter.setRowFilter(RowFilter.andFilter(filters));
 	}
 	
 	public void applyLoanFilter() {
 		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>();
 		filters.add(overdueFilter);
-		filters.add(RowFilter.regexFilter("(?i)" + searchLoanJTextField.getText()));
+		String escaped = Pattern.quote(searchLoanJTextField.getText());
+		filters.add(RowFilter.regexFilter("(?i)" + escaped));
 		loanSorter.setRowFilter(RowFilter.andFilter(filters));
 	}
 	

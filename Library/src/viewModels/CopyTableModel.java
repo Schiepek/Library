@@ -12,6 +12,7 @@ import javax.swing.table.AbstractTableModel;
 import java.lang.String;
 
 import domain.Copy;
+import domain.Copy.Condition;
 import domain.Library;
 import domain.Book;
 import domain.Loan;
@@ -115,6 +116,18 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 		fireTableDataChanged();
 		
 	}
+	
+    public boolean isCellEditable(int row, int col) {
+    	if (col == 1) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public void setValueAt(Object value, int rowIndex, int colIndex) {
+        library.getCopiesOfBook(currentBook).get(rowIndex).setCondition((Condition)value);
+    }
 
 	
 }

@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -33,6 +34,7 @@ import javax.swing.JList;
 
 import domain.Book;
 import domain.Copy;
+import domain.Copy.Condition;
 import domain.Library;
 
 import javax.swing.JComboBox;
@@ -342,13 +344,16 @@ public class BookDetail extends JFrame {
 		});		
 		copyTable.getColumnModel().getColumn(0).setMaxWidth(50);
 		copyTable.getColumnModel().getColumn(1).setMaxWidth(180);
+		copyTable.getColumnModel().getColumn(1).setMinWidth(120);
 		
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
 		copyTable.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-		copyTable.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
 		
+		JComboBox cb = new JComboBox(Condition.values());
 		
+		copyTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(cb));
+		copyTable.getColumnModel().getColumn(1).setCellRenderer(new BookDetailTableCellRenderer());
 		
 	
 }
