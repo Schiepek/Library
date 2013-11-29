@@ -2,10 +2,11 @@ package domain;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Observable;
 
-public class Loan extends Observable {
+public class Loan extends Observable{
 
 	private Copy copy;
 	private Customer customer;

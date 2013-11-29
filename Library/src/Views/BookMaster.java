@@ -25,7 +25,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableStringConverter;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -40,6 +42,8 @@ import java.awt.Font;
 import javax.swing.JButton;
 
 import viewModels.BookTableModel;
+import viewModels.DateRenderer;
+import viewModels.LoanComparator;
 import viewModels.LoanTableModel;
 import domain.Book;
 import domain.Customer;
@@ -456,9 +460,15 @@ public class BookMaster extends JFrame{
 		leftRenderer.setHorizontalAlignment( JLabel.CENTER );
 		loanJTable.getColumnModel().getColumn(1).setCellRenderer( leftRenderer );
 		loanJTable.getColumnModel().getColumn(0).setCellRenderer(new LoanTableCellRenderer());
-			
+		
+		
+		DateRenderer dateRenderer = new DateRenderer();
+		loanJTable.getColumnModel().getColumn(3).setCellRenderer(dateRenderer);
+		
 		loanSorter = new TableRowSorter<LoanTableModel>(loanTableModel);
 		loanJTable.setRowSorter(loanSorter);
+		
+		loanSorter.setComparator( 3, new LoanComparator());
 		
 		overdueFilter = new RowFilter<Object, Object>() {
 	        public boolean include(Entry entry) {

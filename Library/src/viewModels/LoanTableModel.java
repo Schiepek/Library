@@ -1,5 +1,6 @@
 package viewModels;
 
+import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -67,7 +68,7 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
 		case 2:
 			return loan.getCopy().getTitle().getName();
 		case 3:
-			return getLoanInformation(loan);
+			return loan;
 		case 4:
 			return loan.getCustomer().getSurname() + " " +  loan.getCustomer().getName();
 		default:
@@ -93,37 +94,9 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Class getColumnClass (int columnIndex) {
 		if (columnIndex == 1) { return Integer.class; }
+		if (columnIndex == 3) { return GregorianCalendar.class; };
 		if (columnIndex <= 4 && columnIndex >= 0) { return String.class; }
 	return Object.class;
-	}
-	
-	private String getLoanInformation(Loan loan) {
-			return getDateString(loan.getLatestReturnDate()) + getDaysInformationString(loan);
-	}
-	
-	private String getDateString(GregorianCalendar date) {
-		if (date != null) {
-			DateFormat f = SimpleDateFormat.getDateInstance();
-			return f.format(date.getTime());
-		}
-		return "00.00.00";
-	}
-	
-	private String getDaysInformationString(Loan loan) {
-		if(!loan.isOverdue()) {
-			switch (loan.getDaysTillReturn()) {
-				case 0: return " (heute)";
-				case 1: return " (noch 1 Tag)";
-				default: return " (noch " + loan.getDaysTillReturn() + " Tage)";
-			}
-		}
-		else {
-			switch (loan.getDaysOverdue()) {
-				case 0: return " (seit heute)";
-				case 1: return " (seit 1 Tag)";
-				default: return " (seit " + loan.getDaysOverdue() + " Tagen)";
-			}		
-		}
 	}
 
 }
