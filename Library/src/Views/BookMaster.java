@@ -29,6 +29,8 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.table.TableStringConverter;
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -271,8 +273,28 @@ public class BookMaster extends JFrame{
 			}			
 		});
 		
+		
+		
 		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);
 		bookJTable.getColumnModel().getColumn(0).setMinWidth(100);
+		
+		// Shortcut to open BookDetail with Enter or Space Key
+		int condition = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+		InputMap inputMap = bookJTable.getInputMap(condition);
+		ActionMap actionMap = bookJTable.getActionMap();
+
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "Space");
+		actionMap.put("Enter", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				openBookDetail(library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));
+			}
+		});
+		actionMap.put("Space", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				openBookDetail(library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));
+			}
+		});
 		
 		statisticJPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
@@ -450,6 +472,26 @@ public class BookMaster extends JFrame{
 			}
 		});
 		
+		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);
+		bookJTable.getColumnModel().getColumn(0).setMinWidth(100);
+		
+		// Shortcut to open LoanDetail with Enter or Space Key
+		int conditionLoan = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+		InputMap inputMapLoan = loanJTable.getInputMap(condition);
+		ActionMap actionMapLoan = loanJTable.getActionMap();
+
+		inputMapLoan.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+		inputMapLoan.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "Space");
+		actionMapLoan.put("Enter", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				openLoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
+			}
+		});
+		actionMapLoan.put("Space", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				openLoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
+			}
+		});
 
 		
 		loanJTable.getColumnModel().getColumn(0).setMaxWidth(50);
@@ -479,6 +521,8 @@ public class BookMaster extends JFrame{
 	        }
 	    };	    
 	    loanSorter.setRowFilter(overdueFilter);
+	    
+	    getRootPane().setDefaultButton(newBookJButton);
 	
 	}
 	
@@ -513,6 +557,13 @@ public class BookMaster extends JFrame{
 		if(!openedBooks.contains(openBook)) {
 			new BookDetail(library, openBook, openedBooks);
 			if(openBook != null) openedBooks.add(openBook);
+		} else {
+			Window windows[] = Window.getWindows();
+			for (Window w : windows) {
+				if (((JFrame)w).getTitle().equals(openBook.getName())) {
+					((JFrame)w).toFront();
+				}
+			}
 		}
 	}
 	
@@ -522,6 +573,13 @@ public class BookMaster extends JFrame{
 		if(!openedCustomers.contains(openCustomer)) {
 			new LoanDetail(library, loan, openedCustomers);
 			if(loan != null) openedCustomers.add(openCustomer);
+		} else {
+			Window windows[] = Window.getWindows();
+			for (Window w : windows) {
+				if (((JFrame)w).getTitle().equals(openCustomer.getFullName())) {
+					((JFrame)w).toFront();
+				}
+			}
 		}
 	}
 }

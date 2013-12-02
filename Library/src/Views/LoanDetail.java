@@ -372,7 +372,7 @@ public class LoanDetail extends JFrame {
 				}
 			}
 		});
-		
+		getRootPane().setDefaultButton(loanJButton);
 		updateGUI(currentLoan.getCustomer());
 		
 	}

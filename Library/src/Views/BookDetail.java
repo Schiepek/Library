@@ -27,9 +27,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -92,8 +94,11 @@ public class BookDetail extends JFrame {
 		if (currentBook == null) { currentBook = initEmptyBook(); }
 		this.currentBook = currentBook;
 		this.openedBooks = openedBooks;
-		
 		setTitle(currentBook.getName());
+		if (currentBook.getName().isEmpty()) {
+			setTitle("Neues Buch");
+		}
+		
 		initGUI();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -376,7 +381,8 @@ public class BookDetail extends JFrame {
 					removeSelectedJButton.setEnabled(false);
 				}
 			}			
-		});		
+		});
+		
 		copyTable.getColumnModel().getColumn(0).setMaxWidth(50);
 		copyTable.getColumnModel().getColumn(1).setMaxWidth(180);
 		copyTable.getColumnModel().getColumn(1).setMinWidth(120);
@@ -390,6 +396,21 @@ public class BookDetail extends JFrame {
 		copyTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(cb));
 		copyTable.getColumnModel().getColumn(1).setCellRenderer(new BookDetailTableCellRenderer());
 		
+		// Shortcut Delete to delete copy in Table
+		int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
+		InputMap inputMap = copyTable.getInputMap(condition);
+		ActionMap actionMap = copyTable.getActionMap();
+
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "Delete");
+		actionMap.put("Delete", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				deleteCopy();
+				if (copyTable.getSelectedRow() == -1) {
+					removeSelectedJButton.setEnabled(false);
+				}
+			}
+		});
+		getRootPane().setDefaultButton(saveJButton);
 	
 }
 
