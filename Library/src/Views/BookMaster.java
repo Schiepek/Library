@@ -12,6 +12,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.BoxLayout;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -574,10 +575,10 @@ public class BookMaster extends JFrame{
 			new BookDetail(library, openBook, openedBooks);
 			if(openBook != null) openedBooks.add(openBook);
 		} else {
-			Window windows[] = Window.getWindows();
-			for (Window w : windows) {
-				if (((JFrame)w).getTitle().equals(openBook.getName())) {
-					((JFrame)w).toFront();
+			Frame frames[] = this.getFrames();
+			for (Frame f : frames) {
+				if (f.getTitle().equals(openBook.getName())) {
+					f.toFront();
 				}
 			}
 		}
@@ -590,10 +591,10 @@ public class BookMaster extends JFrame{
 			new LoanDetail(library, loan, openedCustomers);
 			if(loan != null) openedCustomers.add(openCustomer);
 		} else {
-			Window windows[] = Window.getWindows();
-			for (Window w : windows) {
-				if (((JFrame)w).getTitle().equals(openCustomer.getFullName())) {
-					((JFrame)w).toFront();
+			Frame frames[] = this.getFrames();
+			for (Frame f : frames) {
+				if (f.getTitle().equals(openCustomer.getFullName())) {
+					f.toFront();
 				}
 			}
 		}
