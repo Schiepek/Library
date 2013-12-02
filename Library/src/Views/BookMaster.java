@@ -18,6 +18,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Window;
 
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -122,7 +124,7 @@ public class BookMaster extends JFrame{
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane);
 		
 		// on ESC key close frame
@@ -217,7 +219,7 @@ public class BookMaster extends JFrame{
 		gbc_showSelectedJButton.gridy = 0;
 		inventoryJPanel.add(showSelectedBookJButton, gbc_showSelectedJButton);
 		
-		JButton newBookJButton = new JButton("Neues Buch hinzufügen");
+		final JButton newBookJButton = new JButton("Neues Buch hinzufügen");
 		newBookJButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				openBookDetail(null);
@@ -287,7 +289,9 @@ public class BookMaster extends JFrame{
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "Space");
 		actionMap.put("Enter", new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				openBookDetail(library.getBooks().get(bookJTable.convertRowIndexToModel(bookJTable.getSelectedRow())));
+				for(int i : bookJTable.getSelectedRows()) {
+					openBookDetail(library.getBooks().get(bookJTable.convertRowIndexToModel(i)));
+				}
 			}
 		});
 		actionMap.put("Space", new AbstractAction() {
@@ -416,7 +420,7 @@ public class BookMaster extends JFrame{
 		gbc_showSelectedLoanJButton.gridy = 0;
 		collectedloanJPanel.add(showSelectedLoanJButton, gbc_showSelectedLoanJButton);
 		
-		JButton newLoanJButton = new JButton("Neue Ausleihe erfassen");
+		final JButton newLoanJButton = new JButton("Neue Ausleihe erfassen");
 		GridBagConstraints gbc_newLoanJButton = new GridBagConstraints();
 		gbc_newLoanJButton.insets = new Insets(0, 0, 5, 0);
 		gbc_newLoanJButton.gridx = 4;
@@ -484,7 +488,9 @@ public class BookMaster extends JFrame{
 		inputMapLoan.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "Space");
 		actionMapLoan.put("Enter", new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				openLoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(loanJTable.getSelectedRow())));
+				for(int i : loanJTable.getSelectedRows()) {
+					openLoanDetail(library.getLentOutLoans().get(loanJTable.convertRowIndexToModel(i)));					
+				}
 			}
 		});
 		actionMapLoan.put("Space", new AbstractAction() {
@@ -523,6 +529,16 @@ public class BookMaster extends JFrame{
 	    loanSorter.setRowFilter(overdueFilter);
 	    
 	    getRootPane().setDefaultButton(newBookJButton);
+	    tabbedPane.addChangeListener(new ChangeListener() {
+	        public void stateChanged(ChangeEvent e) {
+	            //System.out.println("Tab: " + tabbedPane.getSelectedIndex());
+	            if (tabbedPane.getSelectedIndex() == 0) {
+	            	getRootPane().setDefaultButton(newBookJButton);
+	            } else {
+	            	getRootPane().setDefaultButton(newLoanJButton);
+	            }
+	        }
+	    });
 	
 	}
 	
