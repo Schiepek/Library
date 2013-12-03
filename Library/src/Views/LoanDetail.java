@@ -46,6 +46,7 @@ import domain.Copy.Condition;
 import viewModels.CustomerComboBoxModel;
 import viewModels.LoanDetailTableModel;
 
+@SuppressWarnings("serial")
 public class LoanDetail extends JFrame {
 
 	private JPanel contentPane;
@@ -93,7 +94,7 @@ public class LoanDetail extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) { disposeLoanDetail(); }
 		});
-		// on ESC key close frame
+
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
         	
@@ -105,7 +106,7 @@ public class LoanDetail extends JFrame {
 	            }
 	        }
         );
-	    // on Enter key save data in frame
+
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
         	
@@ -228,7 +229,6 @@ public class LoanDetail extends JFrame {
 				Loan addedLoan = library.createAndAddLoan(customer, copy);
 				currentLoan = addedLoan;
 				loanModel = new LoanDetailTableModel(library, currentLoan);
-				//loanModel = new LoanTableModel(library);
 				loanTable.setModel(loanModel);
 				copyIDJTextField.setText("");
 				updateGUI(customer);
@@ -357,8 +357,6 @@ public class LoanDetail extends JFrame {
 		
 	}
 
-	
-	
 	private void updateGUI(Customer c)  {
 		try  {
 			if (c == null && (customerJComboBox.getSelectedIndex() == -1)) {
