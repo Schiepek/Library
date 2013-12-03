@@ -1,11 +1,8 @@
 package Views;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Window;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -15,42 +12,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-
-import domain.Book;
-import domain.Copy;
-import domain.Customer;
-import domain.Library;
-import domain.Loan;
-import domain.Shelf;
-import domain.Copy.Condition;
-
-import javax.swing.BoxLayout;
-
-import java.awt.GridBagLayout;
-
-import javax.swing.JLabel;
-
-import java.awt.GridBagConstraints;
-
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import java.awt.Insets;
-
+import javax.swing.JLabel;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -59,12 +25,26 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
-import viewModels.CopyTableModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import domain.Copy;
+import domain.Customer;
+import domain.Library;
+import domain.Loan;
+import domain.Copy.Condition;
 import viewModels.CustomerComboBoxModel;
 import viewModels.LoanDetailTableModel;
-import viewModels.LoanTableModel;
-
-import javax.swing.DefaultComboBoxModel;
 
 public class LoanDetail extends JFrame {
 
@@ -495,7 +475,10 @@ public class LoanDetail extends JFrame {
 		int[] selected = loanTable.getSelectedRows();
 		ArrayList<Loan> selectedLoans = new ArrayList<Loan>();
 		for(int s : selected) selectedLoans.add(library.getActiveCustomerLoans(currentLoan.getCustomer()).get(s));
-		for(Loan returnLoan : selectedLoans) returnLoan.returnCopy();
+		for(Loan returnLoan : selectedLoans){
+			if (returnLoan.isOverdue())	JOptionPane.showMessageDialog(null, "Für " + customer.getFullName() + " fällt eine Mahngebühr von CHF 3.- an", "Ausleihe überfällig!", 2);
+			returnLoan.returnCopy();
+		}
 		loanTable.clearSelection();
 	}
 	
