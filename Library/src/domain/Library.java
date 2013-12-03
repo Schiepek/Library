@@ -195,7 +195,6 @@ public class Library extends Observable implements Observer{
 	}
 	
 	public void removeLoan(Copy copy) {
-		Loan removedLoan;
 		addBookIndex=-1;
 		editedBookIndex=-1;
 		removeBookIndex=-1;
@@ -242,7 +241,6 @@ public class Library extends Observable implements Observer{
 		removeLoanIndex=-1;
 		addLoanIndex=-1;
 		books.remove(book);
-		
 		doNotify();
 	}
 
