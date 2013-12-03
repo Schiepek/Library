@@ -28,9 +28,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.table.TableStringConverter;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -56,10 +54,7 @@ import domain.Library;
 import domain.Loan;
 
 import java.awt.Insets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.awt.event.KeyEvent;
@@ -72,12 +67,9 @@ import java.awt.event.WindowEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import java.awt.Component;
-
+@SuppressWarnings("serial")
 public class BookMaster extends JFrame{
 
-
-	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private Library library;
 	private BookTableModel bookTableModel;
@@ -114,7 +106,6 @@ public class BookMaster extends JFrame{
 	}
 	
 	private void initGUI() {
-		
 		this.setMinimumSize(new Dimension(1200, 700));
 		bookTableModel= new BookTableModel(library);
 		
@@ -128,7 +119,6 @@ public class BookMaster extends JFrame{
 		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane);
 		
-		// on ESC key close frame
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
         	
@@ -149,7 +139,6 @@ public class BookMaster extends JFrame{
 		statisticJPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,70));
 		bookLayeredPane.add(statisticJPanel);
 		statisticJPanel.setBorder(new TitledBorder(null, "Inventar Statistiken", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
 
 		JPanel inventoryJPanel = new JPanel();
 		bookLayeredPane.add(inventoryJPanel);
@@ -161,7 +150,6 @@ public class BookMaster extends JFrame{
 		gbl_inventoryJPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		inventoryJPanel.setLayout(gbl_inventoryJPanel);
 
-		
 		final JLabel selectedBookJLabel = new JLabel("Ausgewählt: 0");
 		selectedBookJLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		GridBagConstraints gbc_selectedJLabel = new GridBagConstraints();
@@ -232,8 +220,6 @@ public class BookMaster extends JFrame{
 		gbc_newBookJButton.gridy = 0;
 		inventoryJPanel.add(newBookJButton, gbc_newBookJButton);
 
-
-		
 		JScrollPane scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
@@ -276,12 +262,9 @@ public class BookMaster extends JFrame{
 			}			
 		});
 		
-		
-		
 		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);
 		bookJTable.getColumnModel().getColumn(0).setMinWidth(100);
 		
-		// Shortcut to open BookDetail with Enter or Space Key
 		int condition = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 		InputMap inputMap = bookJTable.getInputMap(condition);
 		ActionMap actionMap = bookJTable.getActionMap();
@@ -311,9 +294,7 @@ public class BookMaster extends JFrame{
 		JLayeredPane loanLayeredPane = new JLayeredPane();
 		tabbedPane.addTab("Ausleihen", null, loanLayeredPane, null);
 		loanLayeredPane.setLayout(new BoxLayout(loanLayeredPane, BoxLayout.Y_AXIS));
-		
 
-		
 		JLabel titleJLabel = new JLabel("Swinging Library");
 		titleJLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		titleJLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -323,14 +304,13 @@ public class BookMaster extends JFrame{
 		bookJTable.setRowSorter(bookSorter);
 		
 		availableFilter = new RowFilter<Object, Object>() {
-	        public boolean include(Entry entry) {
+	        public boolean include(@SuppressWarnings("rawtypes") Entry entry) {
 	        	if (showAvailable){
 	        		return true;
 	        	}
 	        	return (((String) entry.getValue(0)).matches("[0-9]+"));
 	        }
 	    };
-	    
 	    bookSorter.setRowFilter(availableFilter);
 	    
 		JPanel loanstatisticJPanel = new JPanel();
@@ -480,9 +460,8 @@ public class BookMaster extends JFrame{
 		bookJTable.getColumnModel().getColumn(0).setMaxWidth(100);
 		bookJTable.getColumnModel().getColumn(0).setMinWidth(100);
 		
-		// Shortcut to open LoanDetail with Enter or Space Key
 		int conditionLoan = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
-		InputMap inputMapLoan = loanJTable.getInputMap(condition);
+		InputMap inputMapLoan = loanJTable.getInputMap(conditionLoan);
 		ActionMap actionMapLoan = loanJTable.getActionMap();
 
 		inputMapLoan.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
@@ -500,7 +479,6 @@ public class BookMaster extends JFrame{
 			}
 		});
 
-		
 		loanJTable.getColumnModel().getColumn(0).setMaxWidth(50);
 		loanJTable.getColumnModel().getColumn(1).setMaxWidth(80);
 		loanJTable.getColumnModel().getColumn(2).setMinWidth(500);
@@ -509,7 +487,6 @@ public class BookMaster extends JFrame{
 		leftRenderer.setHorizontalAlignment( JLabel.CENTER );
 		loanJTable.getColumnModel().getColumn(1).setCellRenderer( leftRenderer );
 		loanJTable.getColumnModel().getColumn(0).setCellRenderer(new LoanTableCellRenderer());
-		
 		
 		DateRenderer dateRenderer = new DateRenderer();
 		loanJTable.getColumnModel().getColumn(3).setCellRenderer(dateRenderer);
@@ -520,7 +497,7 @@ public class BookMaster extends JFrame{
 		loanSorter.setComparator( 3, new LoanComparator());
 		
 		overdueFilter = new RowFilter<Object, Object>() {
-	        public boolean include(Entry entry) {
+	        public boolean include(@SuppressWarnings("rawtypes") Entry entry) {
 	        	if (showOverdue){
 	        		return true;
 	        	}
@@ -532,7 +509,6 @@ public class BookMaster extends JFrame{
 	    getRootPane().setDefaultButton(newBookJButton);
 	    tabbedPane.addChangeListener(new ChangeListener() {
 	        public void stateChanged(ChangeEvent e) {
-	            //System.out.println("Tab: " + tabbedPane.getSelectedIndex());
 	            if (tabbedPane.getSelectedIndex() == 0) {
 	            	getRootPane().setDefaultButton(newBookJButton);
 	            } else {
@@ -575,7 +551,7 @@ public class BookMaster extends JFrame{
 			new BookDetail(library, openBook, openedBooks);
 			if(openBook != null) openedBooks.add(openBook);
 		} else {
-			Frame frames[] = this.getFrames();
+			Frame frames[] = Frame.getFrames();
 			for (Frame f : frames) {
 				if (f.getTitle().equals(openBook.getName())) {
 					f.toFront();
@@ -591,7 +567,7 @@ public class BookMaster extends JFrame{
 			new LoanDetail(library, loan, openedCustomers);
 			if(loan != null) openedCustomers.add(openCustomer);
 		} else {
-			Frame frames[] = this.getFrames();
+			Frame frames[] = Frame.getFrames();
 			for (Frame f : frames) {
 				if (f.getTitle().equals(openCustomer.getFullName())) {
 					f.toFront();

@@ -26,7 +26,6 @@ public class LoanTableCellRenderer extends DefaultTableCellRenderer {
 	
 	@Override
 	public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		
 		if(((String)value).equals("ok"))  {
 	    	setIcon(icons[0]);
 	    }
