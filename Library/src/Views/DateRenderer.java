@@ -1,4 +1,4 @@
-package viewModels;
+package Views;
 
 import java.awt.Component;
 import java.text.DateFormat;

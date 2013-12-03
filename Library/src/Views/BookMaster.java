@@ -45,7 +45,6 @@ import java.awt.Font;
 import javax.swing.JButton;
 
 import viewModels.BookTableModel;
-import viewModels.DateRenderer;
 import viewModels.LoanComparator;
 import viewModels.LoanTableModel;
 import domain.Book;
