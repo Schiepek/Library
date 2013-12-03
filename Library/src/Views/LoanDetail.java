@@ -473,10 +473,12 @@ public class LoanDetail extends JFrame {
 		int[] selected = loanTable.getSelectedRows();
 		ArrayList<Loan> selectedLoans = new ArrayList<Loan>();
 		for(int s : selected) selectedLoans.add(library.getActiveCustomerLoans(currentLoan.getCustomer()).get(s));
+		int i = 0;
 		for(Loan returnLoan : selectedLoans){
-			if (returnLoan.isOverdue())	JOptionPane.showMessageDialog(null, "Für " + customer.getFullName() + " fällt eine Mahngebühr von CHF 3.- an", "Ausleihe überfällig!", 2);
+			if (returnLoan.isOverdue()) i+=3;
 			returnLoan.returnCopy();
 		}
+		if (i > 0) JOptionPane.showMessageDialog(null, "Für " + customer.getFullName() + " fällt eine Mahngebühr von CHF " + i + ".- an", "Ausleihe überfällig!", 2);
 		loanTable.clearSelection();
 	}
 	
