@@ -11,6 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import domain.Library;
 import domain.Loan;
 
+@SuppressWarnings("serial")
 public class LoanDetailTableModel extends AbstractTableModel implements Observer {
 
 	private String[] columns = { "" , "" , "" , "" };
@@ -74,6 +75,7 @@ public class LoanDetailTableModel extends AbstractTableModel implements Observer
 		fireTableDataChanged();
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Class getColumnClass (int columnIndex) {
 		if (columnIndex == 1) { return Integer.class; }
@@ -109,5 +111,4 @@ public class LoanDetailTableModel extends AbstractTableModel implements Observer
 			}		
 		}
 	}
-
 }

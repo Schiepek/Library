@@ -1,10 +1,6 @@
 package viewModels;
 
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -12,11 +8,10 @@ import javax.swing.table.AbstractTableModel;
 
 import java.lang.String;
 
-import domain.Copy;
 import domain.Library;
-import domain.Book;
 import domain.Loan;
 
+@SuppressWarnings("serial")
 public class LoanTableModel extends AbstractTableModel implements Observer {
 
 	private String[] columns = { "" , "" , "" , "" , "" };
@@ -91,6 +86,7 @@ public class LoanTableModel extends AbstractTableModel implements Observer {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Class getColumnClass (int columnIndex) {
 		if (columnIndex == 1) { return Integer.class; }

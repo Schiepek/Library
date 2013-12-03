@@ -5,6 +5,7 @@ import javax.swing.ComboBoxModel;
 
 import domain.Library;
 
+@SuppressWarnings("serial")
 public class CustomerComboBoxModel extends AbstractListModel implements ComboBoxModel {
 
 	private Library library;

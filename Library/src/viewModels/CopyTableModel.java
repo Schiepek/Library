@@ -2,9 +2,7 @@ package viewModels;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,6 +17,7 @@ import domain.Library;
 import domain.Book;
 import domain.Loan;
 
+@SuppressWarnings("serial")
 public class CopyTableModel extends AbstractTableModel implements Observer {
 
 	private Library library;
@@ -58,6 +57,7 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 		return library.getCopiesOfBook(currentBook).size();
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Class getColumnClass (int columnIndex) {
 		if (columnIndex == 0) { return Integer.class; }
@@ -127,7 +127,6 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
         return false;
     }
 
-
     public void setValueAt(Object value, int rowIndex, int colIndex) {
     	Copy copy= library.getCopiesOfBook(currentBook).get(rowIndex);
         
@@ -151,6 +150,4 @@ public class CopyTableModel extends AbstractTableModel implements Observer {
 		}
 		return false;
 	}
-
-	
 }

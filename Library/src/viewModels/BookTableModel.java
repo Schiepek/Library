@@ -16,6 +16,7 @@ import domain.Library;
 import domain.Book;
 import domain.Loan;
 
+@SuppressWarnings("serial")
 public class BookTableModel extends AbstractTableModel implements Observer {
 
 	private String[] columns = { "" , "" , "" , "" };
@@ -91,6 +92,7 @@ public class BookTableModel extends AbstractTableModel implements Observer {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Class getColumnClass (int columnIndex) {
 		if (columnIndex <= 3 && columnIndex >= 0) { return String.class; }
