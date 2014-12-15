@@ -56,6 +56,7 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -167,6 +168,7 @@ public class BookMaster extends JFrame{
 				}
 			}
 		});
+
 		
 		searchBookJTextField = new JTextField();
 		searchBookJTextField.getDocument().addDocumentListener(new DocumentListener() {
@@ -181,6 +183,7 @@ public class BookMaster extends JFrame{
 			@Override
 			public void changedUpdate(DocumentEvent e) {}			
 		});
+		
 		GridBagConstraints gbc_searchJTextField = new GridBagConstraints();
 		gbc_searchJTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_searchJTextField.fill = GridBagConstraints.HORIZONTAL;
